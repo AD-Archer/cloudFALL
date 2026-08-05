@@ -100,23 +100,6 @@
     return bits
   })
 
-  // Section numbers are assigned at render time because one unit only exists
-  // when Stern has content for it. Counting by hand would drift the moment
-  // somebody writes an example.
-  let num = $derived.by(() => {
-    const keys = [
-      'ledger',
-      'build',
-      'help',
-      ...(api.examples.length ? ['ideas'] : []),
-      'terms',
-      'shop',
-      'checks',
-      'faq'
-    ]
-    return Object.fromEntries(keys.map((k, i) => [k, String(i + 1).padStart(2, '0')]))
-  })
-
   const toggleFaq = (i) => {
     const next = openFaq === i ? -1 : i
     openFaq = next
@@ -291,7 +274,6 @@
     <Reveal>
       <Unit
         id="ledger"
-        n={num.ledger}
         title="The cloud you rent"
         port="8096"
         sub="Every subscription in your house, floating overhead, sized by what it costs. Pop one and it falls, and what lands is the thing you could run yourself instead. That is the project."
@@ -307,7 +289,6 @@
     <Reveal>
       <Unit
         id="build"
-        n={num.build}
         title="How it works"
         port="22"
         sub="Rebuild one thing you pay for every month so that you own it. Ship it open-source and the hardware to keep it running is on us."
@@ -368,7 +349,6 @@
     <Reveal>
       <Unit
         id="help"
-        n={num.help}
         title="Never hosted anything?"
         port="41641"
         sub="Then this program is aimed squarely at you. Nobody is expected to arrive knowing this, and there are people in the Slack who will get your first one running with you."
@@ -398,7 +378,6 @@
       <Reveal>
         <Unit
           id="ideas"
-          n={num.ideas}
           title="Things to build"
           port="8000"
           sub="Starting points, not a menu. Take one and twist it into the stack you actually want."
@@ -412,7 +391,6 @@
     <Reveal>
       <Unit
         id="terms"
-        n={num.terms}
         title="New here?"
         port="53"
         sub="The whole deal in four lines. Read it before the shop."
@@ -429,7 +407,6 @@
     <Reveal>
       <Unit
         id="shop"
-        n={num.shop}
         title="The shop"
         port="32400"
         sub="Priced in tracked hours, cheapest first. Somewhere to put the library once it is yours."
@@ -447,7 +424,7 @@
 
     <!-- ───────────────────────── CHECKS ───────────────────────── -->
     <Reveal>
-      <Unit id="checks" n={num.checks} title={RULES.title} port="9090" sub={RULES.intro}>
+      <Unit id="checks" title={RULES.title} port="9090" sub={RULES.intro}>
         <Rules
           items={RULES.items}
           requirements={api.rules?.requirements}
@@ -540,7 +517,6 @@
     <Reveal>
       <Unit
         id="faq"
-        n={num.faq}
         title="Questions"
         port="3000"
         sub="Straight from the program. Anything missing, ask in the Slack."
@@ -571,21 +547,13 @@
     </Reveal>
 
     <!-- ───────────────────────── CLOSER ─────────────────────────
-         The end of the page is the end of the argument: a blank disc with
-         the program's own line scrawled on it in marker. It is the object
-         the shop actually sends you, and it says "yours" better than another
-         centred headline over two buttons could. -->
+         The end of the page is the logo and the line it came with, next to
+         the ask. Nothing else. -->
     <Reveal>
       <section class="closer" id="signup">
-        <div class="disc-stage" aria-hidden="true">
-          <div class="disc">
-            <span class="sheen"></span>
-            <!-- printed art on top, sharpie underneath, the way a burned disc
-                 actually ends up -->
-            <img class="disc-mark" src="/logo.png" alt="" width="70" height="60" />
-            <span class="scrawl">destroy the cloud<br />by making it free</span>
-            <span class="hub"></span>
-          </div>
+        <div class="closer-mark" aria-hidden="true">
+          <img src="/logo.png" alt="" width="240" height="207" />
+          <span class="scrawl">destroy the cloud<br />by making it free</span>
         </div>
 
         <div class="closer-copy">
@@ -995,83 +963,21 @@
     box-shadow: var(--lift), var(--rim);
   }
 
-  /* ── THE DISC ──
-     Silver, iridescent, tilted, with the program's line in marker on the
-     label. Not decoration: this is the object the shop sends you. */
-  .disc-stage { display: grid; place-items: center; }
-
-  .disc {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: min(100%, 268px);
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background:
-      repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.42) 0 1.5px, rgba(188, 198, 232, 0.42) 1.5px 3px),
-      conic-gradient(from 200deg, #ffc9a4, #b9d2ff, #ffc4e6, #b4efd8, #ffdda2, #ffc9a4);
-    box-shadow:
-      var(--lift),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.85),
-      inset 0 0 42px rgba(90, 70, 190, 0.14);
-    transform: rotate(-7deg);
-    transition: transform 1.2s var(--ease-out);
-  }
-  .closer:hover .disc { transform: rotate(4deg); }
-
-  /* the label: the matte ring a burned disc is printed on */
-  .disc::before {
-    content: '';
-    position: absolute;
-    inset: 15%;
-    border-radius: 50%;
-    background: linear-gradient(200deg, #fffdf8 0%, #fdf4e8 100%);
-    box-shadow: inset 0 0 0 1px rgba(120, 108, 210, 0.14);
-  }
-
-  .sheen {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: linear-gradient(128deg, rgba(255, 255, 255, 0.85) 0%, transparent 34%, transparent 62%, rgba(255, 255, 255, 0.6) 100%);
-  }
-
-  /* the printed side of the label */
-  .disc-mark {
-    position: absolute;
-    top: 21%;
-    width: 27%;
+  .closer-mark { display: grid; justify-items: center; gap: 16px; }
+  .closer-mark img {
+    width: min(100%, 250px);
     height: auto;
-    filter: drop-shadow(0 2px 4px rgba(38, 22, 110, 0.18));
+    filter: drop-shadow(0 16px 26px rgba(38, 22, 110, 0.24));
+    animation: bob 6s ease-in-out infinite alternate;
   }
-
-  /* and the bit somebody wrote on afterwards */
   .scrawl {
-    position: absolute;
-    top: 63%;
-    z-index: 1;
-    width: 74%;
     font-family: var(--marker);
     font-weight: 700;
-    font-size: clamp(0.92rem, 1.9vw, 1.2rem);
-    line-height: 1;
+    font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+    line-height: 1.05;
     text-align: center;
     color: #2c1c63;
     transform: rotate(-3deg);
-  }
-
-  /* the hub, punched through the middle of the label */
-  .hub {
-    position: absolute;
-    width: 15%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: #eeedff;
-    /* the clear plastic ring a disc has around its hole, then the hole */
-    box-shadow:
-      inset 0 0 0 1px rgba(120, 108, 210, 0.28),
-      0 0 0 13px rgba(236, 240, 255, 0.92),
-      0 0 0 14px rgba(120, 108, 210, 0.16);
   }
 
   .closer h2 {
@@ -1126,6 +1032,11 @@
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: none; }
   }
+  @keyframes bob {
+    from { transform: translateY(-8px) rotate(-2deg); }
+    to { transform: translateY(8px) rotate(2deg); }
+  }
+
 
   /* ── RESPONSIVE ── */
   @media (max-width: 960px) {
@@ -1146,7 +1057,7 @@
     .closer h2 { max-width: none; }
     .closer-sub { margin-inline: auto; }
     .closer .cta-row { justify-content: center; }
-    .disc { width: min(100%, 210px); }
+    .closer-mark img { width: min(100%, 170px); }
   }
   @media (max-width: 640px) {
     .flag { left: 10px; }

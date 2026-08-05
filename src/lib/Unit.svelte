@@ -6,7 +6,6 @@
   //
   //   <Unit n="01" title="The ledger" port="8096" sub="…">…</Unit>
   let {
-    n = '',
     title = '',
     sub = '',
     port = '',
@@ -19,11 +18,10 @@
 
 <section class="unit cloud" {id}>
   <header class="band">
-    {#if n}<span class="n">{n}</span>{/if}
     <h2>{title}</h2>
     {#if port}<span class="pill port">:{port}</span>{/if}
     {#if cta && href}
-      <a class="btn-text go" {href} data-analytics="CTA: Click" data-analytics-placement="unit-{id || n}">
+      <a class="btn-text go" {href} data-analytics="CTA: Click" data-analytics-placement="unit-{id}">
         {cta}
       </a>
     {/if}
@@ -45,14 +43,6 @@
     flex-wrap: wrap;
     padding: 18px 24px 16px;
     background: linear-gradient(180deg, #f2f1ff 0%, rgba(242, 241, 255, 0) 100%);
-  }
-
-  /* Just the number. Any disc around it competed with the heading it was
-     supposed to be numbering. */
-  .n {
-    font-family: var(--mono);
-    font-size: 0.74rem;
-    color: #c96f14;
   }
 
   h2 {
