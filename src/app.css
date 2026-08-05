@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap');
 
 /* ══════════════════════════════════════════════════════════════════
    CLOUDFALL house system: a daydream sky.
@@ -45,6 +45,7 @@
   --sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
   --display: 'Fredoka', 'Nunito', system-ui, sans-serif;
   --mono: 'DM Mono', ui-monospace, monospace;
+  --marker: 'Caveat', 'Bradley Hand', cursive;
 
   --maxw: 1120px;
   --pad: clamp(14px, 4vw, 32px);
@@ -135,8 +136,8 @@ p { margin: 0; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 12px 5px;
-  border-radius: var(--r-pill);
+  padding: 4px 10px 5px;
+  border-radius: 8px;
   font-family: var(--mono);
   font-size: 0.66rem;
   letter-spacing: 0.08em;
@@ -158,43 +159,42 @@ p { margin: 0; }
 }
 
 /* ── BUTTONS ──────────────────────────────────────────────────────
-   Round and warm, but flat. The glossy three-stop version read as a
-   plastic toy against everything else on the page, so the fill is now
-   one gentle gradient and the shadow is a soft warm halo rather than
-   a moulded rim. It still gives on press. */
+   The one crisp thing in a page of clouds. Capsules made every action
+   look like a game piece, so buttons keep a modest radius and a tight
+   shadow: the softness lives in the panels, not the controls. */
 .btn {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 9px;
-  padding: 14px 28px;
+  padding: 13px 24px;
   border: none;
-  border-radius: var(--r-pill);
+  border-radius: 13px;
   font-family: var(--display);
-  font-size: 1.02rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--ember-ink);
   background: linear-gradient(180deg, #ffa851 0%, #ff8f2e 100%);
-  box-shadow: 0 8px 18px rgba(226, 130, 30, 0.26);
+  box-shadow: 0 5px 12px rgba(226, 130, 30, 0.24);
   transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease-out), background 0.2s;
 }
 
 .btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   background: linear-gradient(180deg, #ffb264 0%, #ff9a41 100%);
-  box-shadow: 0 12px 24px rgba(226, 130, 30, 0.3);
+  box-shadow: 0 8px 18px rgba(226, 130, 30, 0.28);
 }
-.btn:active { transform: translateY(1px); box-shadow: 0 4px 10px rgba(226, 130, 30, 0.24); }
+.btn:active { transform: translateY(1px); box-shadow: 0 3px 8px rgba(226, 130, 30, 0.22); }
 
 .btn-soft {
   color: var(--ink);
   background: #fff;
-  box-shadow: 0 8px 18px rgba(38, 22, 110, 0.14), inset 0 0 0 1px rgba(120, 108, 210, 0.18);
+  box-shadow: 0 5px 12px rgba(38, 22, 110, 0.12), inset 0 0 0 1px rgba(120, 108, 210, 0.2);
 }
-.btn-soft:hover { background: #fff; box-shadow: 0 12px 24px rgba(38, 22, 110, 0.18), inset 0 0 0 1px rgba(120, 108, 210, 0.3); }
+.btn-soft:hover { box-shadow: 0 8px 18px rgba(38, 22, 110, 0.16), inset 0 0 0 1px rgba(120, 108, 210, 0.34); }
 
-.btn-sm { padding: 10px 18px; font-size: 0.9rem; }
+.btn-sm { padding: 9px 16px; font-size: 0.88rem; border-radius: 11px; }
 
 .btn:disabled { filter: grayscale(0.5); opacity: 0.55; cursor: not-allowed; transform: none; }
 
@@ -221,9 +221,9 @@ p { margin: 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .chip {
-  padding: 7px 15px;
+  padding: 7px 14px;
   border: none;
-  border-radius: var(--r-pill);
+  border-radius: 10px;
   font-family: var(--display);
   font-size: 0.84rem;
   font-weight: 500;

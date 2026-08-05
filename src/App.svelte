@@ -492,33 +492,46 @@
       </Unit>
     </Reveal>
 
-    <!-- ───────────────────────── CLOSER ───────────────────────── -->
+    <!-- ───────────────────────── CLOSER ─────────────────────────
+         The end of the page is the end of the argument: a blank disc with
+         the program's own line scrawled on it in marker. It is the object
+         the shop actually sends you, and it says "yours" better than another
+         centred headline over two buttons could. -->
     <Reveal>
       <section class="closer" id="signup">
-        <p class="pill pill-ember tagline">{CONFIG.tagline}</p>
-        <h2>Take one thing back.</h2>
-        <p class="closer-sub">
-          Pick the subscription you would miss least, build the replacement, and host it
-          yourself. Free, open to every teenager on earth, and the only requirement is that
-          you finish.
-        </p>
-        <div class="cta-row center">
-          <a
-            href={CONFIG.welcomeUrl}
-            class="btn"
-            data-analytics="CTA: Click"
-            data-analytics-placement="footer-onboarding"
-          >
-            Sign up free
-          </a>
-          <a
-            href={CONFIG.slackUrl}
-            class="btn btn-soft"
-            data-analytics="CTA: Click"
-            data-analytics-placement="footer-slack"
-          >
-            Join the Slack
-          </a>
+        <div class="disc-stage" aria-hidden="true">
+          <div class="disc">
+            <span class="sheen"></span>
+            <span class="scrawl">destroy the cloud<br />by making it free</span>
+            <span class="hub"></span>
+          </div>
+        </div>
+
+        <div class="closer-copy">
+          <h2>Then it is just a thing you own.</h2>
+          <p class="closer-sub">
+            No essay, no interview, no fee, and no monthly anything. Pick the
+            subscription you would miss least, build the replacement, log the hours,
+            and the discs to keep the library on come from us.
+          </p>
+          <div class="cta-row">
+            <a
+              href={CONFIG.welcomeUrl}
+              class="btn"
+              data-analytics="CTA: Click"
+              data-analytics-placement="footer-onboarding"
+            >
+              Sign up free
+            </a>
+            <a
+              href={CONFIG.slackUrl}
+              class="btn-text"
+              data-analytics="CTA: Click"
+              data-analytics-placement="footer-slack"
+            >
+              or say hello in #ysws-cloudfall
+            </a>
+          </div>
         </div>
       </section>
     </Reveal>
@@ -601,8 +614,6 @@
     padding: 6px clamp(18px, 2.6vw, 26px) clamp(22px, 3vw, 30px);
   }
   .figure { min-width: 0; }
-
-  .tagline { margin-bottom: 16px; }
 
   h1 {
     font-size: clamp(2.6rem, 5.6vw, 4.3rem);
@@ -775,26 +786,98 @@
 
   /* ── CLOSER ── */
   .closer {
-    padding: clamp(44px, 6vw, 78px) 26px;
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: center;
+    gap: clamp(24px, 5vw, 60px);
+    padding: clamp(34px, 5vw, 58px) clamp(26px, 4vw, 52px);
     border-radius: var(--r-xl);
-    text-align: center;
     background:
-      radial-gradient(70% 80% at 50% -6%, rgba(255, 213, 168, 0.85) 0%, transparent 62%),
+      radial-gradient(60% 90% at 18% 10%, rgba(255, 213, 168, 0.6) 0%, transparent 62%),
       linear-gradient(180deg, #ffffff 0%, #f0efff 100%);
     box-shadow: var(--lift), var(--rim);
   }
-  .closer h2 {
-    margin-top: 14px;
-    font-size: clamp(2.3rem, 6vw, 4rem);
+
+  /* ── THE DISC ──
+     Silver, iridescent, tilted, with the program's line in marker on the
+     label. Not decoration: this is the object the shop sends you. */
+  .disc-stage { display: grid; place-items: center; }
+
+  .disc {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(100%, 268px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+      repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.42) 0 1.5px, rgba(188, 198, 232, 0.42) 1.5px 3px),
+      conic-gradient(from 200deg, #ffc9a4, #b9d2ff, #ffc4e6, #b4efd8, #ffdda2, #ffc9a4);
+    box-shadow:
+      var(--lift),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.85),
+      inset 0 0 42px rgba(90, 70, 190, 0.14);
+    transform: rotate(-7deg);
+    transition: transform 1.2s var(--ease-out);
+  }
+  .closer:hover .disc { transform: rotate(4deg); }
+
+  /* the label: the matte ring a burned disc is printed on */
+  .disc::before {
+    content: '';
+    position: absolute;
+    inset: 15%;
+    border-radius: 50%;
+    background: linear-gradient(200deg, #fffdf8 0%, #fdf4e8 100%);
+    box-shadow: inset 0 0 0 1px rgba(120, 108, 210, 0.14);
+  }
+
+  .sheen {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: linear-gradient(128deg, rgba(255, 255, 255, 0.85) 0%, transparent 34%, transparent 62%, rgba(255, 255, 255, 0.6) 100%);
+  }
+
+  .scrawl {
+    position: relative;
+    z-index: 1;
+    font-family: var(--marker);
     font-weight: 700;
-    letter-spacing: -0.035em;
+    font-size: clamp(1rem, 2.1vw, 1.36rem);
+    line-height: 1.02;
+    text-align: center;
+    color: #2c1c63;
+    transform: rotate(-3deg) translateY(-28%);
+  }
+
+  /* the hub, punched through the middle of the label */
+  .hub {
+    position: absolute;
+    width: 15%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #eeedff;
+    /* the clear plastic ring a disc has around its hole, then the hole */
+    box-shadow:
+      inset 0 0 0 1px rgba(120, 108, 210, 0.28),
+      0 0 0 13px rgba(236, 240, 255, 0.92),
+      0 0 0 14px rgba(120, 108, 210, 0.16);
+  }
+
+  .closer h2 {
+    font-size: clamp(2rem, 4.6vw, 3.2rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    max-width: 15ch;
   }
   .closer-sub {
-    max-width: 50ch;
-    margin: 16px auto 0;
-    font-size: 1.06rem;
+    max-width: 54ch;
+    margin-top: 16px;
+    font-size: 1.04rem;
     color: var(--ink-2);
   }
+  .closer .cta-row { margin-top: 24px; }
 
   /* ── FOOTER ── */
   .footer { padding: 20px 24px 18px; }
@@ -842,6 +925,11 @@
        has been read */
     .figure { grid-row: 1; }
     .helps { grid-template-columns: minmax(0, 1fr); }
+    .closer { grid-template-columns: minmax(0, 1fr); text-align: center; }
+    .closer h2 { max-width: none; }
+    .closer-sub { margin-inline: auto; }
+    .closer .cta-row { justify-content: center; }
+    .disc { width: min(100%, 210px); }
   }
   @media (max-width: 640px) {
     .flag { left: 10px; }

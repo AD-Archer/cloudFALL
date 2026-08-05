@@ -54,6 +54,10 @@ drawn as a mass of soft bubbles that keeps coming apart. Puffs drift off the und
 fall, and pile up at the bottom of the frame. It is the name of the program as an
 animation, and the caption underneath says what the pile means.
 
+**The disc** at the foot of the page is the object the shop actually sends you: a blank
+disc with the program's own line scrawled on it in marker. It carries the tagline so no
+section needs a mono eyebrow above its heading.
+
 **The pond** ([src/lib/Ledger.svelte](src/lib/Ledger.svelte)) is the section that does
 the arguing. Every subscription floats overhead as a bubble sized by what it costs, so
 the gym dwarfs the password manager on sight. Pop one and it lands underneath as the
@@ -120,7 +124,10 @@ SITE_URL=https://cloudfall.hackclub.com just build  # or set it per deploy
 
 ## Notes
 
-- Fonts are Fredoka (display), Nunito (body) and DM Mono (data), from Google Fonts.
+- Fonts are Fredoka (display), Nunito (body), DM Mono (data) and Caveat, which is used
+  for exactly one thing: the marker writing on the disc.
+- Buttons keep a modest 13px radius on purpose. The softness belongs to the panels; a
+  page of capsules made every action look like a game piece.
 - Mono type is deliberate: ports, sizes, prices and statuses stay in it, and it is what
   stops a sky full of bubbles from reading as a toy.
 - `prefers-reduced-motion` is respected everywhere. The sky freezes, the cloud renders
