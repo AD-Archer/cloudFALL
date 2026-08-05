@@ -1,23 +1,27 @@
 <script>
-  // The interactive receipt. Tap the things you actually pay for and the page
-  // adds up the year you would get back. Each row carries the real mark of the
-  // service, because "Netflix" as a word is an abstraction and the logo is the
-  // thing you recognise on a bank statement.
+  // THE POND. Every subscription your household rents floats overhead as a
+  // bubble, sized by what it costs: the gym is enormous, the password manager
+  // is a pea. Pop one and it falls out of the sky and lands underneath as
+  // something you could run yourself. That is the whole program in one
+  // interaction, and it is the same story the hero animation tells.
   //
-  // Every row also names the open-source thing that does the same job on
-  // hardware you own, so the list doubles as the project brief: pick a row,
-  // build that.
+  // A table of checkboxes said the same thing and nobody would have touched it.
+  import { fly } from 'svelte/transition'
+  import { cubicOut } from 'svelte/easing'
   import { trackEvent } from './insight.js'
   import { RENTALS } from './data.js'
   import { BRANDS } from './brands.js'
 
   let { welcomeUrl = '' } = $props()
 
-  let picked = $state(new Set(RENTALS.filter((r) => r.on).map((r) => r.id)))
+  // start with the three almost everybody pays for, so the ground is never
+  // empty on arrival and the interaction has an example to copy
+  let popped = $state(new Set(RENTALS.filter((r) => r.on).map((r) => r.id)))
 
-  let monthly = $derived(
-    RENTALS.filter((r) => picked.has(r.id)).reduce((sum, r) => sum + r.usd, 0)
-  )
+  let floating = $derived(RENTALS.filter((r) => !popped.has(r.id)))
+  let landed = $derived(RENTALS.filter((r) => popped.has(r.id)))
+
+  let monthly = $derived(landed.reduce((sum, r) => sum + r.usd, 0))
   let yearly = $derived(monthly * 12)
 
   const money = (n, cents = false) =>
@@ -26,268 +30,358 @@
       maximumFractionDigits: cents ? 2 : 0
     })}`
 
-  function toggle(rental) {
-    const next = new Set(picked)
-    next.has(rental.id) ? next.delete(rental.id) : next.add(rental.id)
-    picked = next
-    trackEvent('Ledger: Toggle', {
-      service: rental.service,
-      state: next.has(rental.id) ? 'on' : 'off',
-      monthly: monthly.toFixed(2)
-    })
+  // Area, not diameter, tracks the price: doubling the bill has to look like
+  // twice the bubble, and the gym at $42 has to dwarf a password manager.
+  // a fixed scatter, so bubbles sit at different heights without ever
+  // overlapping or reflowing into a straight line
+  const DRIFT = [0, 30, 10, 38, 4, 26, 16, 34]
+
+  const DEAREST = Math.max(...RENTALS.map((r) => r.usd))
+  const size = (usd) => Math.round(62 + 92 * Math.sqrt(usd / DEAREST))
+
+  function pop(r) {
+    popped = new Set(popped).add(r.id)
+    trackEvent('Ledger: Pop', { service: r.service, monthly: (monthly + r.usd).toFixed(2) })
   }
+
+  function refill(r) {
+    const next = new Set(popped)
+    next.delete(r.id)
+    popped = next
+    trackEvent('Ledger: Refill', { service: r.service })
+  }
+
+  // the burst: the bubble swells for an instant and is gone
+  const burst = (node, { duration = 300 } = {}) => ({
+    duration,
+    easing: cubicOut,
+    css: (t) => `opacity:${t}; transform:scale(${1 + (1 - t) * 0.45}); filter:blur(${(1 - t) * 3}px)`
+  })
 </script>
 
 <div class="ledger">
-  <ul class="rows">
-    {#each RENTALS as r}
-      {@const on = picked.has(r.id)}
-      {@const mark = r.brand ? BRANDS[r.brand] : null}
-      {@const swap = r.swapBrand ? BRANDS[r.swapBrand] : null}
-      <li class="row" class:on>
-        <!-- one hit target per row: the sentence underneath is the reason to
-             tick it, so it has to be part of the control -->
-        <button type="button" class="hit" aria-pressed={on} onclick={() => toggle(r)}>
-          <span class="mark" style={mark ? `--brand:${mark.hex}` : ''}>
-            {#if mark}
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d={mark.path} /></svg>
-            {:else}
-              <!-- no logo for a gym membership, so it gets the one glyph on
-                   this page we drew ourselves -->
-              <svg viewBox="0 0 24 24" aria-hidden="true" class="own">
-                <path
-                  d="M4 9v6M20 9v6M7 6.5v11M17 6.5v11M7 12h10"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.4"
-                  stroke-linecap="round"
-                />
-              </svg>
-            {/if}
-          </span>
+  <!-- ── OVERHEAD: what you rent ─────────────────────────────────── -->
+  <div class="pond" class:clear={!floating.length}>
+    <p class="prompt">
+      {#if floating.length}
+        Pop everything your household pays for
+      {:else}
+        That is the lot. Tap anything below to put it back.
+      {/if}
+    </p>
 
-          <span class="who">
-            <span class="service">{r.service}</span>
-            <span class="what">{r.what}</span>
-          </span>
-
-          <span class="price">
-            <span class="amount">{money(r.usd, true)}</span>
-            <span class="per mono">/mo</span>
-          </span>
-
-          <span class="tick" aria-hidden="true"></span>
-
-          <span class="swap">
-            <span class="run">
-              <span class="arrow" aria-hidden="true">
-                <svg viewBox="0 0 20 20">
+    <ul class="bubbles">
+      {#each floating as r (r.id)}
+        {@const mark = r.brand ? BRANDS[r.brand] : null}
+        {@const i = RENTALS.indexOf(r)}
+        <li class="slot" style="--d:{size(r.usd)}px; --i:{i}; --y:{DRIFT[i % DRIFT.length]}px" out:burst>
+          <button
+            type="button"
+            class="bubble"
+            onclick={() => pop(r)}
+            aria-label="Pop {r.service}, {money(r.usd, true)} a month"
+          >
+            <span class="logo" style={mark ? `--brand:${mark.hex}` : ''}>
+              {#if mark}
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d={mark.path} /></svg>
+              {:else}
+                <!-- a gym has no logo to borrow, so it gets the one glyph on
+                     this page we drew ourselves -->
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="own">
                   <path
-                    d="M3 10h13m0 0-4.5-4.5M16 10l-4.5 4.5"
+                    d="M4 9v6M20 9v6M7 6.5v11M17 6.5v11M7 12h10"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="2"
+                    stroke-width="2.4"
                     stroke-linecap="round"
-                    stroke-linejoin="round"
                   />
                 </svg>
-              </span>
-              {#if swap}
-                <span class="swap-mark" style="--brand:{swap.hex}">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d={swap.path} /></svg>
-                </span>
               {/if}
-              <span class="app">{r.replacement}</span>
-              {#if r.port}<span class="port mono">:{r.port}</span>{/if}
             </span>
-            <span class="how">{r.how}</span>
-          </span>
-        </button>
-      </li>
-    {/each}
-  </ul>
+            <span class="cost">{money(r.usd, true)}</span>
+          </button>
+          <span class="name">{r.service}</span>
+        </li>
+      {/each}
+    </ul>
 
-  <aside class="total" aria-live="polite">
-    <p class="t-label mono">you would stop paying</p>
-    <p class="t-num">{money(yearly)}</p>
-    <p class="t-unit mono">every year</p>
-    <p class="t-sub">
-      {money(monthly, true)} a month across {picked.size} subscription{picked.size === 1 ? '' : 's'},
-      and none of it belongs to you at the end of it.
+  </div>
+
+  <!-- ── UNDERFOOT: what you would run instead ───────────────────── -->
+  <div class="ground">
+    <header class="tally">
+      <div class="sum">
+        <p class="mono">you would stop paying</p>
+        <p class="num" aria-live="polite">{money(yearly)}</p>
+        <p class="mono unit">a year, {money(monthly, true)} a month</p>
+      </div>
+      <a
+        class="btn"
+        href={welcomeUrl}
+        data-analytics="CTA: Click"
+        data-analytics-placement="ledger-onboarding"
+      >
+        Build one of these
+      </a>
+    </header>
+
+    {#if landed.length}
+      <ul class="kept">
+        {#each landed as r (r.id)}
+          {@const swap = r.swapBrand ? BRANDS[r.swapBrand] : null}
+          <li in:fly={{ y: -22, duration: 340, easing: cubicOut }}>
+            <div class="tile">
+              <div class="tile-top">
+                {#if swap}
+                  <span class="swap-mark" style="--brand:{swap.hex}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d={swap.path} /></svg>
+                  </span>
+                {:else}
+                  <span class="swap-dot" aria-hidden="true"></span>
+                {/if}
+                <span class="app">{r.replacement}</span>
+                {#if r.port}<span class="port mono">:{r.port}</span>{/if}
+                <span class="saved mono">{money(r.usd, true)}/mo back</span>
+              </div>
+              <p class="how">{r.how}</p>
+              <button
+                type="button"
+                class="undo"
+                onclick={() => refill(r)}
+                aria-label="Put {r.service} back in the sky"
+              >
+                I still pay for {r.service}
+              </button>
+            </div>
+          </li>
+        {/each}
+      </ul>
+    {:else}
+      <p class="empty">
+        Nothing down here yet. Pop a bubble and the thing you would run instead lands here,
+        with a port number and a reason.
+      </p>
+    {/if}
+
+    <p class="note mono">
+      us list prices, give or take. what your family actually pays is the number that matters
     </p>
-    <a
-      class="btn btn-sm t-cta"
-      href={welcomeUrl}
-      data-analytics="CTA: Click"
-      data-analytics-placement="ledger-onboarding"
-    >
-      Build one of these
-    </a>
-    <p class="t-note mono">us list prices, give or take. yours will differ</p>
-  </aside>
+  </div>
 </div>
 
 <style>
-  .ledger {
+  .ledger { display: grid; gap: 14px; padding-top: 6px; }
+
+  /* ── THE SKY ── */
+  .pond {
+    position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 268px;
-    gap: 24px;
-    align-items: start;
-    padding-top: 6px;
-  }
-
-  .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-
-  .row {
-    border-radius: var(--r);
-    background: var(--cloud-2);
-    transition: background 0.2s, box-shadow 0.24s var(--ease-out), transform 0.24s var(--ease);
-  }
-  .row:hover { background: #fff; box-shadow: var(--lift-sm); }
-  .row.on {
-    background: linear-gradient(180deg, #fff6ec 0%, #ffeedd 100%);
-    box-shadow: 0 8px 20px rgba(226, 130, 30, 0.2), inset 0 0 0 2px rgba(255, 155, 61, 0.5);
-  }
-
-  .hit {
-    display: grid;
-    grid-template-columns: 46px minmax(0, 1fr) auto 26px;
+    grid-template-rows: auto 1fr;
     align-items: center;
-    gap: 6px 14px;
-    width: 100%;
-    padding: 13px 16px 14px;
-    border: none;
-    background: none;
-    text-align: left;
-    color: inherit;
+    gap: 10px;
+    min-height: 296px;
+    padding: 20px 20px 30px;
     border-radius: var(--r);
+    background:
+      radial-gradient(80% 60% at 76% 0%, rgba(255, 213, 168, 0.5) 0%, transparent 60%),
+      linear-gradient(180deg, #6455f5 0%, #8b9bff 62%, #c3d8ff 100%);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.45), inset 0 -3px 0 rgba(60, 40, 160, 0.16);
+    transition: min-height 0.4s var(--ease-out);
+  }
+  .pond.clear { min-height: 170px; }
+
+  .prompt {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 0.98rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
   }
 
-  /* the logo sits in its own white bubble, so eight different brand colours
-     never touch each other or the row behind them */
-  .mark {
+  .bubbles {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px 18px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .slot {
     display: grid;
-    place-items: center;
-    width: 46px;
-    height: 46px;
+    justify-items: center;
+    gap: 7px;
+    width: var(--d);
+    margin-top: var(--y, 0);
+    /* every bubble drifts on its own clock, so the group never pulses in sync */
+    animation: bob 5.5s calc(var(--i) * -0.7s) ease-in-out infinite alternate;
+  }
+
+  .bubble {
+    position: relative;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 3px;
+    width: var(--d);
+    height: var(--d);
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.86) 42%, rgba(233, 240, 255, 0.72) 100%);
+    box-shadow:
+      0 10px 22px rgba(40, 24, 120, 0.28),
+      inset 0 -6px 14px rgba(120, 130, 220, 0.28),
+      inset 0 5px 8px rgba(255, 255, 255, 0.95);
+    transition: transform 0.24s var(--ease), box-shadow 0.24s var(--ease-out);
+  }
+  .bubble:hover {
+    transform: scale(1.07);
+    box-shadow:
+      0 16px 30px rgba(40, 24, 120, 0.32),
+      inset 0 -6px 14px rgba(120, 130, 220, 0.22),
+      inset 0 5px 8px rgba(255, 255, 255, 1);
+  }
+  .bubble:active { transform: scale(0.94); }
+
+  /* the specular pin-prick that makes a circle read as a bubble */
+  .bubble::after {
+    content: '';
+    position: absolute;
+    top: 15%;
+    left: 21%;
+    width: 13%;
+    height: 13%;
     border-radius: 50%;
     background: #fff;
-    box-shadow: 0 3px 9px rgba(38, 22, 110, 0.14), inset 0 0 0 1px rgba(38, 22, 110, 0.05);
-  }
-  .mark svg { width: 23px; height: 23px; fill: var(--brand, var(--ink-2)); }
-  .mark .own { fill: none; color: var(--ink-2); }
-
-  .who { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
-  .service { font-family: var(--display); font-weight: 600; font-size: 1.08rem; }
-  .what {
-    font-size: 0.82rem;
-    color: var(--ink-3);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    opacity: 0.95;
+    pointer-events: none;
   }
 
-  .price { display: flex; align-items: baseline; gap: 3px; }
-  .amount {
+  .logo svg { width: calc(var(--d) * 0.3); height: calc(var(--d) * 0.3); fill: var(--brand, var(--ink-2)); }
+  .logo .own { fill: none; color: var(--ink-2); }
+
+  .cost {
     font-family: var(--display);
     font-weight: 600;
-    font-size: 1.12rem;
-    color: var(--ink-2);
+    font-size: calc(var(--d) * 0.15);
+    color: var(--ink);
     font-variant-numeric: tabular-nums;
   }
-  .row.on .amount { color: var(--ember-lo); }
-  .per { font-size: 0.62rem; }
 
-  /* the state, as a bubble that inflates when it is on */
-  .tick {
-    justify-self: end;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: inset 0 0 0 2px var(--cloud-3);
-    transition: background 0.2s, box-shadow 0.2s, transform 0.24s var(--ease);
-  }
-  .row.on .tick {
-    transform: scale(1.06);
-    background: linear-gradient(180deg, var(--ember-hi), var(--ember));
-    box-shadow: 0 4px 10px rgba(215, 105, 10, 0.35), inset 0 0 0 2px rgba(255, 255, 255, 0.5);
-  }
-  .row.on .tick::after {
-    content: '';
-    display: block;
-    width: 5px;
-    height: 10px;
-    margin: 4px 0 0 9px;
-    border: solid #fff;
-    border-width: 0 2.5px 2.5px 0;
-    transform: rotate(42deg);
-  }
-
-  .swap {
-    grid-column: 2 / 5;
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 2px 12px;
-  }
-  .run { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
-  .arrow { color: var(--ink-3); }
-  .arrow svg { width: 17px; height: 17px; }
-  .swap-mark { display: grid; place-items: center; }
-  .swap-mark svg { width: 15px; height: 15px; fill: var(--brand); }
-  .app { font-family: var(--display); font-weight: 600; font-size: 0.94rem; color: var(--violet); }
-  .port { font-size: 0.62rem; }
-  .how {
-    flex: 1 1 24ch;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    color: var(--ink-2);
-    max-width: 62ch;
-  }
-
-  /* ── THE TOTAL ──
-     Sticky, because the number is the argument and it has to stay on screen
-     while you tap your way down eight rows. */
-  .total {
-    position: sticky;
-    top: 56px;
-    padding: 22px 22px 20px;
-    border-radius: var(--r);
+  .name {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 0.78rem;
+    color: #fff;
     text-align: center;
-    background:
-      radial-gradient(90% 60% at 50% 0%, rgba(255, 214, 170, 0.55), transparent 70%),
-      linear-gradient(180deg, #ffffff 0%, #fff3e6 100%);
-    box-shadow: var(--lift), inset 0 2px 0 rgba(255, 255, 255, 0.9);
+    line-height: 1.2;
+    text-shadow: 0 1px 3px rgba(30, 18, 90, 0.45);
   }
-  .t-label { font-size: 0.66rem; color: var(--ink-3); }
-  .t-num {
-    margin-top: 6px;
+
+  /* ── THE GROUND ── */
+  .ground {
+    padding: 20px 22px 22px;
+    border-radius: var(--r);
+    background: linear-gradient(180deg, #ffffff 0%, #fff4e8 100%);
+    box-shadow: var(--lift-sm);
+  }
+
+  .tally {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-bottom: 18px;
+  }
+  .num {
     font-family: var(--display);
     font-weight: 700;
-    font-size: clamp(2.8rem, 6vw, 3.6rem);
-    line-height: 0.96;
-    letter-spacing: -0.03em;
+    font-size: clamp(2.6rem, 7vw, 3.8rem);
+    line-height: 0.94;
+    letter-spacing: -0.035em;
     color: var(--ember-lo);
     font-variant-numeric: tabular-nums;
   }
-  .t-unit { margin-top: 6px; font-size: 0.64rem; }
-  .t-sub {
-    margin-top: 14px;
-    font-size: 0.92rem;
-    line-height: 1.5;
-    color: var(--ink-2);
-  }
-  .t-cta { width: 100%; margin-top: 16px; }
-  .t-note { margin-top: 12px; font-size: 0.58rem; line-height: 1.5; }
+  .sum .mono { font-size: 0.66rem; }
+  .unit { margin-top: 7px; }
 
-  @media (max-width: 900px) {
-    .ledger { grid-template-columns: minmax(0, 1fr); }
-    /* the total leads on a phone: the number is the reason to read the rows */
-    .total { position: static; order: -1; }
-    .what { display: none; }
-    .hit { grid-template-columns: 40px minmax(0, 1fr) auto 22px; gap: 5px 11px; padding: 12px 13px; }
-    .mark { width: 40px; height: 40px; }
-    .mark svg { width: 20px; height: 20px; }
+  .kept {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+    gap: 10px;
+  }
+
+  .tile {
+    height: 100%;
+    padding: 15px 17px 14px;
+    border-radius: var(--r-sm);
+    background: #fff;
+    box-shadow: inset 0 0 0 1px rgba(255, 155, 61, 0.28);
+  }
+  .tile-top { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .swap-mark svg { width: 17px; height: 17px; fill: var(--brand); }
+  .swap-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, var(--ember-hi), var(--ember));
+  }
+  .app { font-family: var(--display); font-weight: 600; font-size: 1rem; color: var(--violet); }
+  .port { font-size: 0.6rem; }
+  .saved { margin-left: auto; font-size: 0.6rem; color: var(--ember-lo); }
+
+  .how { margin-top: 7px; font-size: 0.88rem; line-height: 1.5; color: var(--ink-2); }
+
+  .undo {
+    margin-top: 10px;
+    padding: 0;
+    border: none;
+    background: none;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .undo:hover { color: var(--violet); }
+
+  .empty {
+    padding: 4px 2px 6px;
+    font-size: 0.96rem;
+    color: var(--ink-3);
+    max-width: 62ch;
+  }
+
+  .note { margin-top: 16px; font-size: 0.58rem; line-height: 1.6; }
+
+  @keyframes bob {
+    from { transform: translateY(-7px); }
+    to { transform: translateY(7px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slot { animation: none; }
+  }
+
+  @media (max-width: 640px) {
+    .pond { padding: 16px 14px 22px; gap: 14px; }
+    .bubbles { gap: 8px 12px; }
+    /* the biggest bubble would otherwise take half a phone screen */
+    .slot { width: calc(var(--d) * 0.78); }
+    .bubble { width: calc(var(--d) * 0.78); height: calc(var(--d) * 0.78); }
+    .logo svg { width: calc(var(--d) * 0.24); height: calc(var(--d) * 0.24); }
+    .cost { font-size: calc(var(--d) * 0.12); }
+    .ground { padding: 16px 15px 18px; }
+    .kept { grid-template-columns: minmax(0, 1fr); }
   }
 </style>

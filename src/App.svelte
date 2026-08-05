@@ -290,9 +290,9 @@
       <Unit
         id="ledger"
         n={num.ledger}
-        title="What you are paying for"
+        title="The cloud you rent"
         port="8096"
-        sub="Tap everything your household rents. Each row names the open-source thing that does the same job on a machine you own. That is the project."
+        sub="Every subscription in your house, floating overhead, sized by what it costs. Pop one and it falls, and what lands is the thing you could run yourself instead. That is the project."
       >
         <Ledger welcomeUrl={CONFIG.welcomeUrl} />
       </Unit>
