@@ -234,7 +234,7 @@
 
         <div class="hero-copy">
           <p class="pill pill-ember tagline">{CONFIG.tagline}</p>
-          <h1>Stop renting<br />Own your stuff.</h1>
+          <h1>You're wasting money.</h1>
           <p class="lede">
             Your films, your music, your photos, your files. You pay every month for a copy
             you do not own, on a computer you cannot touch. Build the thing that replaces
@@ -269,6 +269,26 @@
         {#each readout as bit}<span class="bit">{bit}</span>{/each}
       </p>
     </section>
+
+    <!-- ───────────────────────── THE LINE ─────────────────────────
+         The one section with no panel under it. After a page of white cards
+         the argument gets said straight onto the sky, at the size it deserves,
+         and then the page carries on. -->
+    <Reveal>
+      <section class="creed" id="creed" data-analytics-section="creed">
+        <h2>
+          The cloud is just<br />
+          someone else's computer.<br />
+          <em>
+            So why not use your own?
+            <svg class="underline" viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M3 9.5C58 3.5 132 2.5 297 6.5" />
+            </svg>
+          </em>
+        </h2>
+        <p class="creed-foot">a server is just a computer that never gets turned off</p>
+      </section>
+    </Reveal>
 
     <!-- ───────────────────────── LEDGER ───────────────────────── -->
     <Reveal>
@@ -345,34 +365,6 @@
       </Unit>
     </Reveal>
 
-    <!-- ───────────────── NEVER SELF-HOSTED ANYTHING ───────────────── -->
-    <Reveal>
-      <Unit
-        id="help"
-        title="Never hosted anything?"
-        port="41641"
-        sub="Then this program is aimed squarely at you. Nobody is expected to arrive knowing this, and there are people in the Slack who will get your first one running with you."
-      >
-        <ul class="helps">
-          {#each HELP as h}
-            <li class="help">
-              <span class="pill pill-blush">{h.tag}</span>
-              <h3>{h.title}</h3>
-              <p>{h.body}</p>
-            </li>
-          {/each}
-        </ul>
-        <p class="help-tail">
-          Stuck at any point, from picking a service to opening a terminal, ask in
-          <a
-            href={CONFIG.slackUrl}
-            data-analytics="CTA: Click"
-            data-analytics-placement="help-slack">#ysws-cloudfall</a
-          >. Bring the error message, however small it looks.
-        </p>
-      </Unit>
-    </Reveal>
-
     <!-- ──────────── THINGS TO BUILD (live, hidden when empty) ──────────── -->
     {#if api.examples.length}
       <Reveal>
@@ -399,36 +391,6 @@
           slackUrl={CONFIG.slackUrl}
           hackatimeUrl={CONFIG.hackatimeUrl}
           welcomeUrl={CONFIG.welcomeUrl}
-        />
-      </Unit>
-    </Reveal>
-
-    <!-- ───────────────────────── SHOP (live) ───────────────────────── -->
-    <Reveal>
-      <Unit
-        id="shop"
-        title="The shop"
-        port="32400"
-        sub="Priced in tracked hours, cheapest first. Somewhere to put the library once it is yours."
-        cta="Full shop"
-        href={CONFIG.programUrl}
-      >
-        <Shop
-          prizes={api.prizes}
-          loading={api.loading}
-          shopUrl={CONFIG.shopUrl}
-          programUrl={CONFIG.programUrl}
-        />
-      </Unit>
-    </Reveal>
-
-    <!-- ───────────────────────── CHECKS ───────────────────────── -->
-    <Reveal>
-      <Unit id="checks" title={RULES.title} port="9090" sub={RULES.intro}>
-        <Rules
-          items={RULES.items}
-          requirements={api.rules?.requirements}
-          aiPercent={api.rules?.ai?.maxPercent}
         />
       </Unit>
     </Reveal>
@@ -476,6 +438,36 @@
           </div>
         </div>
       </section>
+    </Reveal>
+
+    <!-- ───────────────────────── SHOP (live) ───────────────────────── -->
+    <Reveal>
+      <Unit
+        id="shop"
+        title="The shop"
+        port="32400"
+        sub="Priced in tracked hours, cheapest first. Somewhere to put the library once it is yours."
+        cta="Full shop"
+        href={CONFIG.programUrl}
+      >
+        <Shop
+          prizes={api.prizes}
+          loading={api.loading}
+          shopUrl={CONFIG.shopUrl}
+          programUrl={CONFIG.programUrl}
+        />
+      </Unit>
+    </Reveal>
+
+    <!-- ───────────────────────── CHECKS ───────────────────────── -->
+    <Reveal>
+      <Unit id="checks" title={RULES.title} port="9090" sub={RULES.intro}>
+        <Rules
+          items={RULES.items}
+          requirements={api.rules?.requirements}
+          aiPercent={api.rules?.ai?.maxPercent}
+        />
+      </Unit>
     </Reveal>
 
     <!-- ─────────────── NEWS / EVENTS (live, hidden when empty) ─────────────── -->
@@ -543,6 +535,34 @@
             someone will answer.
           </p>
         {/if}
+      </Unit>
+    </Reveal>
+
+    <!-- ───────────────── NEVER SELF-HOSTED ANYTHING ───────────────── -->
+    <Reveal>
+      <Unit
+        id="help"
+        title="Never hosted anything?"
+        port="41641"
+        sub="Then this program is aimed squarely at you. Nobody is expected to arrive knowing this, and there are people in the Slack who will get your first one running with you."
+      >
+        <ul class="helps">
+          {#each HELP as h}
+            <li class="help">
+              <span class="pill pill-blush">{h.tag}</span>
+              <h3>{h.title}</h3>
+              <p>{h.body}</p>
+            </li>
+          {/each}
+        </ul>
+        <p class="help-tail">
+          Stuck at any point, from picking a service to opening a terminal, ask in
+          <a
+            href={CONFIG.slackUrl}
+            data-analytics="CTA: Click"
+            data-analytics-placement="help-slack">#ysws-cloudfall</a
+          >. Bring the error message, however small it looks.
+        </p>
       </Unit>
     </Reveal>
 
@@ -712,6 +732,69 @@
     height: 7px;
     border-radius: 50%;
     background: var(--blush);
+  }
+
+  /* ── THE LINE ──
+     No card, no border, no fill: this one sits on the sky. It is the only
+     place on the page where the argument is made at full volume, so it gets
+     the whole width and nothing competes with it. */
+  .creed {
+    padding: clamp(30px, 6vw, 66px) 0 clamp(26px, 5vw, 54px);
+    text-align: center;
+  }
+
+  .creed h2 {
+    font-size: clamp(2.1rem, 6.4vw, 5rem);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    color: #fff;
+    text-shadow: 0 4px 22px rgba(30, 18, 90, 0.32);
+  }
+
+  .creed em {
+    position: relative;
+    display: inline-block;
+    font-style: normal;
+    color: #ffb768;
+  }
+
+  /* drawn, not a border: a straight rule under a hand-lettered brand would be
+     the one square edge on the page */
+  .underline {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.14em;
+    width: 100%;
+    height: 0.16em;
+    overflow: visible;
+  }
+  .underline path {
+    fill: none;
+    stroke: var(--ember);
+    stroke-width: 7;
+    stroke-linecap: round;
+    /* drawn in on reveal, so the emphasis lands after the line is read */
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    animation: draw 0.9s 0.45s var(--ease-out) forwards;
+  }
+
+  .creed-foot {
+    margin-top: clamp(18px, 3vw, 30px);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    /* the sky behind this is sometimes a white cloud, so the small type needs
+       both the opacity and the shadow to stay readable */
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 8px rgba(30, 18, 90, 0.45);
+  }
+
+  @keyframes draw {
+    to { stroke-dashoffset: 0; }
   }
 
   /* ── MOVES ──

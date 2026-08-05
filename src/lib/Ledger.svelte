@@ -171,10 +171,6 @@
         with a port number and a reason.
       </p>
     {/if}
-
-    <p class="note mono">
-      us list prices, give or take. what your family actually pays is the number that matters
-    </p>
   </div>
 </div>
 
