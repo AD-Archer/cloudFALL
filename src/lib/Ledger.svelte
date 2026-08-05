@@ -33,6 +33,12 @@
 
   // Area, not diameter, tracks the price: doubling the bill has to look like
   // twice the bubble, and the gym at $42 has to dwarf a password manager.
+  // Two of these have no mark anyone can borrow, so they get glyphs we drew.
+  const GLYPHS = {
+    dumbbell: 'M4 9v6M20 9v6M7 6.5v11M17 6.5v11M7 12h10',
+    cube: 'M12 3.2 20.5 8v8L12 20.8 3.5 16V8ZM3.5 8 12 12.8 20.5 8M12 12.8v8'
+  }
+
   // a fixed scatter, so bubbles sit at different heights without ever
   // overlapping or reflowing into a straight line
   const DRIFT = [0, 30, 10, 38, 4, 26, 16, 34]
@@ -64,6 +70,8 @@
 <div class="ledger">
   <!-- ── OVERHEAD: what you rent ─────────────────────────────────── -->
   <div class="pond" class:clear={!floating.length}>
+    <!-- a paragraph, not a heading: the page already has one h1 and this sits
+         inside a section that has its own -->
     <p class="prompt">
       {#if floating.length}
         Pop everything your household pays for
@@ -87,15 +95,14 @@
               {#if mark}
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d={mark.path} /></svg>
               {:else}
-                <!-- a gym has no logo to borrow, so it gets the one glyph on
-                     this page we drew ourselves -->
                 <svg viewBox="0 0 24 24" aria-hidden="true" class="own">
                   <path
-                    d="M4 9v6M20 9v6M7 6.5v11M17 6.5v11M7 12h10"
+                    d={GLYPHS[r.glyph] ?? GLYPHS.dumbbell}
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="2.4"
+                    stroke-width="2.1"
                     stroke-linecap="round"
+                    stroke-linejoin="round"
                   />
                 </svg>
               {/if}
@@ -193,11 +200,16 @@
   .pond.clear { min-height: 170px; }
 
   .prompt {
+    max-width: 20ch;
+    margin: 4px auto 2px;
     font-family: var(--display);
-    font-weight: 500;
-    font-size: 0.98rem;
-    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #fff;
     text-align: center;
+    text-shadow: 0 2px 10px rgba(30, 18, 90, 0.28);
   }
 
   .bubbles {

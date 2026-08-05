@@ -91,6 +91,18 @@ export const RENTALS = [
     how: "The same box you built for the last one. A second streaming service is just another shelf on it.",
   },
   {
+    id: "games",
+    brand: null,
+    glyph: "cube",
+    swapBrand: null,
+    service: "Minecraft Realms",
+    what: "Realms Plus, ten players",
+    usd: 7.99,
+    replacement: "Paper server",
+    port: "25565",
+    how: "Your world on your own box, with whatever mods you want, staying up after you stop paying anyone.",
+  },
+  {
     id: "notes",
     brand: "notion",
     swapBrand: "joplin",
@@ -148,6 +160,7 @@ export const RENTALS = [
   {
     id: "gym",
     brand: null,
+    glyph: "dumbbell",
     swapBrand: null,
     service: "The gym",
     what: "The one you drive past",
@@ -159,36 +172,58 @@ export const RENTALS = [
 ];
 
 /**
- * How the program runs, in order. The numbering is real: you cannot log hours
- * against a project you have not started, or spend hours you have not shipped.
+ * The whole program is three moves. Making an account and tracking hours are
+ * real requirements but they are paperwork, and paperwork goes in the footnote
+ * underneath rather than in the list, where it competed with the actual deal.
+ * Keep every body under about twelve words.
  */
-export const STEPS = [
+export const MOVES = [
   {
-    n: "01",
-    title: "Sign up",
-    body: "Make a CloudFALL account on Stern and read the welcome page. Free, no application, about two minutes.",
+    n: "1",
+    art: "bubble",
+    title: "Pick",
+    body: "Anything with a monthly bill. Netflix, Realms, iCloud, the gym.",
   },
   {
-    n: "02",
-    title: "Pick the subscription you are killing",
-    body: "One thing you or your family pay for every month. Media, storage, photos, notes, even the gym. Say what it is in your project description.",
+    n: "2",
+    art: "box",
+    title: "Rebuild",
+    body: "Same job, your hardware, open source. One file starts it.",
   },
   {
-    n: "03",
-    title: "Build the replacement",
-    body: "It has to run on a machine somebody owns, and someone other than you has to be able to stand it up. That means a README and a compose file, not a folder of scripts.",
-  },
-  {
-    n: "04",
-    title: "Track every hour",
-    body: "Log your build time with Hackatime and link those projects when you submit. Untracked hours cannot be counted, and only your non-AI hours earn credit.",
-  },
-  {
-    n: "05",
-    title: "Ship it, then spend the hours",
-    body: "Submit an open-source repo and a live link a reviewer can actually open. Approved hours are the price tag in the shop.",
+    n: "3",
+    art: "disc",
+    title: "Keep",
+    body: "The hours you logged buy the gear to keep it running.",
   },
 ];
+
+/** The mechanics, compressed into the strip that closes the section. */
+export const FINE_PRINT = [
+  "free to enter",
+  "ages 13 to 18",
+  "sign up on stern",
+  "hours tracked in hackatime",
+  "non-AI hours only",
+];
+
+/**
+ * Who runs this. Most people arriving from a link have never heard of Hack
+ * Club, and the age rule is the one piece of eligibility that stops people
+ * halfway through, so it is stated here rather than buried in the FAQ.
+ */
+export const HACK_CLUB = {
+  headline: "Where teens make cool stuff.",
+  body:
+    "Hack Club is the world's largest nonprofit movement of teenagers making cool " +
+    "projects. Clubs in a thousand schools, hackathons on trains and in ferry " +
+    "terminals, and dozens of You Ship We Ship programs like this one, all of it run " +
+    "by and for teenagers.",
+  eligibility:
+    "CloudFALL is open to anyone aged 13 to 18, anywhere on earth. Sign up in your own " +
+    "name with your own account, and the hours you log have to be hours you worked.",
+  facts: ["13 to 18", "any country", "free, always", "no application"],
+};
 
 /**
  * Reusable <Rules> content. The AI cap and any extra program requirements come
@@ -218,8 +253,8 @@ export const RULES = {
     },
     {
       tag: "IT RUNS",
-      text: "A live link a reviewer can open and use. Self-hosted only? Ship a compose file and a demo video instead.",
-      mark: "a compose file and a demo video",
+      text: "A live link a reviewer can open and use. Self-hosted only? Ship a repo and docker container.",
+      mark: "a repo and docker container",
     },
     {
       tag: "YOURS",

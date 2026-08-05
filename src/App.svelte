@@ -12,7 +12,7 @@
   import StatusPage from './lib/StatusPage.svelte'
   import { loadContent } from './lib/api/stern.js'
   import { initAnalytics, refreshAnalyticsSections, trackEvent } from './lib/insight.js'
-  import { CONFIG, RENTALS, STEPS, RULES, HELP } from './lib/data.js'
+  import { CONFIG, RENTALS, MOVES, FINE_PRINT, RULES, HELP, HACK_CLUB } from './lib/data.js'
 
   let openFaq = $state(0)
   let locationState = $state(readLocation())
@@ -300,34 +300,67 @@
       </Unit>
     </Reveal>
 
-    <!-- ───────────────────────── THE BUILD ───────────────────────── -->
+    <!-- ───────────────────────── THE BUILD ─────────────────────────
+         Three moves, not five steps. The account and the time tracking are
+         real, but they are paperwork: they sit in one line underneath rather
+         than taking two of the five slots people actually read. -->
     <Reveal>
       <Unit
         id="build"
         n={num.build}
         title="How it works"
         port="22"
-        sub="Five steps, in order. No application, no interview, no fee."
+        sub="Rebuild one thing you pay for every month so that you own it. Ship it open-source and the hardware to keep it running is on us."
       >
-        <ol class="steps">
-          {#each STEPS as s}
-            <li class="step">
-              <span class="step-n">{s.n}</span>
-              <div class="step-copy">
-                <h3>{s.title}</h3>
-                <p>{s.body}</p>
-              </div>
+        <ol class="moves">
+          {#each MOVES as m}
+            <li class="move">
+              <span class="art" aria-hidden="true">
+                <svg viewBox="0 0 56 56">
+                  <circle cx="28" cy="28" r="28" class="badge" />
+                  {#if m.art === 'bubble'}
+                    <!-- a bill: the thing arriving every month -->
+                    <path
+                      d="M18 14h20v26l-4-3-3.5 3-3.5-3-3.5 3-3.5-3-2 1.5V14Z"
+                      class="stroke"
+                    />
+                    <path d="M23 22h10M23 28h10" class="stroke" />
+                    <path d="M23 34h6" class="accent" />
+                  {:else if m.art === 'box'}
+                    <!-- a machine of your own, with its power light on -->
+                    <rect x="14" y="16" width="28" height="10" rx="3" class="stroke" />
+                    <rect x="14" y="30" width="28" height="10" rx="3" class="stroke" />
+                    <path d="M32 21h5M32 35h5" class="stroke" />
+                    <circle cx="21" cy="21" r="2" class="accent-fill" />
+                    <circle cx="21" cy="35" r="2" class="accent-fill" />
+                  {:else}
+                    <!-- a disc, which is what turns up in the post -->
+                    <circle cx="28" cy="28" r="13" class="stroke" />
+                    <circle cx="28" cy="28" r="3.6" class="stroke" />
+                    <path d="M28 15a13 13 0 0 1 11.3 6.5" class="accent" />
+                  {/if}
+                </svg>
+              </span>
+              <h3><span class="move-n">{m.n}</span>{m.title}</h3>
+              <p>{m.body}</p>
             </li>
           {/each}
         </ol>
+
         <a
-          class="btn steps-cta"
+          class="btn moves-cta"
           href={CONFIG.welcomeUrl}
           data-analytics="CTA: Click"
           data-analytics-placement="build-onboarding"
         >
-          Start at step one
+          Sign up free
         </a>
+
+        <!-- the same footer treatment the hero uses: the mechanics, stated
+             once, across the bottom edge of the panel -->
+        <p class="fine">
+          {#each FINE_PRINT as f}<span class="fine-bit">{f}</span>{/each}
+        </p>
       </Unit>
     </Reveal>
 
@@ -423,6 +456,51 @@
       </Unit>
     </Reveal>
 
+    <!-- ───────────────────────── HACK CLUB ─────────────────────────
+         Most people arriving from a link have never heard of Hack Club, and
+         the age rule is the one bit of eligibility that stops somebody
+         halfway through. Both belong on the page, not in the FAQ. -->
+    <Reveal>
+      <section class="hc cloud" id="hackclub" data-analytics-section="hackclub">
+        <div class="hc-art">
+          <img src="/branding/flag-standalone.svg" alt="Hack Club" width="260" height="150" />
+        </div>
+
+        <div class="hc-copy">
+          <h2>{HACK_CLUB.headline}</h2>
+          <p class="hc-body">{HACK_CLUB.body}</p>
+          <p class="hc-elig">{HACK_CLUB.eligibility}</p>
+
+          <ul class="hc-facts">
+            {#each HACK_CLUB.facts as f}
+              <li>{f}</li>
+            {/each}
+          </ul>
+
+          <div class="cta-row">
+            <a
+              class="btn btn-soft btn-sm"
+              href={CONFIG.flagUrl}
+              target="_blank"
+              rel="noopener"
+              data-analytics="CTA: Click"
+              data-analytics-placement="hackclub-site"
+            >
+              What is Hack Club?
+            </a>
+            <a
+              class="btn-text"
+              href="https://stern.hackclub.com/rudder/"
+              data-analytics="CTA: Click"
+              data-analytics-placement="hackclub-ysws"
+            >
+              Other YSWS
+            </a>
+          </div>
+        </div>
+      </section>
+    </Reveal>
+
     <!-- ─────────────── NEWS / EVENTS (live, hidden when empty) ─────────────── -->
     {#if api.news.length}
       <Reveal>
@@ -502,6 +580,9 @@
         <div class="disc-stage" aria-hidden="true">
           <div class="disc">
             <span class="sheen"></span>
+            <!-- printed art on top, sharpie underneath, the way a burned disc
+                 actually ends up -->
+            <img class="disc-mark" src="/logo.png" alt="" width="70" height="60" />
             <span class="scrawl">destroy the cloud<br />by making it free</span>
             <span class="hub"></span>
           </div>
@@ -665,33 +746,149 @@
     background: var(--blush);
   }
 
-  /* ── STEPS ── */
-  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-  .step {
+  /* ── MOVES ──
+     Three cards, read left to right, with a chevron between them so the row
+     reads as a sequence rather than three unrelated features. */
+  .moves {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: grid;
-    grid-template-columns: 44px minmax(0, 1fr);
-    gap: 16px;
-    align-items: start;
-    padding: 14px 18px 16px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .move {
+    position: relative;
+    padding: 22px 22px 24px;
     border-radius: var(--r);
     background: var(--cloud-2);
   }
-  /* flat and pale: a numbered blob with a drop shadow on every step turned
-     the list into a row of buttons that could not be pressed */
-  .step-n {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    font-family: var(--mono);
-    font-size: 0.82rem;
-    color: var(--violet);
-    background: #e7e5ff;
+  .move + .move::before {
+    content: '';
+    position: absolute;
+    left: -11px;
+    top: 58px;
+    width: 12px;
+    height: 12px;
+    border-right: 2.5px solid var(--ink-3);
+    border-top: 2.5px solid var(--ink-3);
+    border-radius: 2px;
+    transform: rotate(45deg);
+    opacity: 0.55;
   }
-  .step-copy h3 { padding-top: 6px; font-size: 1.14rem; }
-  .step-copy p { margin-top: 6px; color: var(--ink-2); max-width: 68ch; }
-  .steps-cta { margin-top: 20px; margin-left: 60px; }
+
+  .art { display: block; width: 64px; height: 64px; margin-bottom: 4px; }
+  .art svg { width: 100%; height: 100%; }
+  /* one badge, one stroke weight, one warm accent per mark, so the three read
+     as a set rather than three clip-art choices */
+  .art :global(.badge) { fill: #eceaff; }
+  .art :global(.stroke) {
+    fill: none;
+    stroke: var(--violet);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .art :global(.accent) {
+    fill: none;
+    stroke: var(--ember);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+  .art :global(.accent-fill) { fill: var(--ember); }
+
+  .move h3 {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 12px;
+    font-size: 1.5rem;
+  }
+  .move-n {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--ember-lo);
+  }
+  .move p {
+    margin-top: 6px;
+    font-size: 0.98rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+    max-width: 30ch;
+  }
+
+  /* the mechanics, as the panel's own footer: same band the hero closes with */
+  .fine {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 26px;
+    margin: 24px -24px -26px;
+    padding: 15px 24px 17px;
+    border-top: 1px solid var(--cloud-3);
+    background: rgba(244, 247, 255, 0.7);
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .fine-bit { display: flex; align-items: center; gap: 10px; }
+  .fine-bit::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--blush);
+  }
+
+  .moves-cta { margin-top: 20px; }
+
+  /* ── HACK CLUB ── */
+  .hc {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(20px, 4vw, 46px);
+    padding: clamp(26px, 3.6vw, 40px) clamp(24px, 3vw, 40px);
+  }
+  .hc-art { display: grid; place-items: center; }
+  .hc-art img {
+    width: 100%;
+    max-width: 240px;
+    filter: drop-shadow(0 10px 20px rgba(38, 22, 110, 0.22));
+    transform: rotate(-3deg);
+  }
+  .hc h2 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); font-weight: 700; letter-spacing: -0.03em; }
+  .hc-body { margin-top: 12px; color: var(--ink-2); max-width: 62ch; }
+  .hc-elig {
+    margin-top: 12px;
+    padding-left: 14px;
+    border-left: 3px solid #ec3750;
+    color: var(--ink);
+    font-weight: 600;
+    max-width: 62ch;
+  }
+  .hc-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hc-facts li {
+    padding: 5px 12px 6px;
+    border-radius: 8px;
+    background: #ffe9ec;
+    color: #c22240;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+  .hc .cta-row { margin-top: 20px; gap: 18px; }
 
   /* ── HELP ── */
   .helps {
@@ -839,16 +1036,28 @@
     background: linear-gradient(128deg, rgba(255, 255, 255, 0.85) 0%, transparent 34%, transparent 62%, rgba(255, 255, 255, 0.6) 100%);
   }
 
+  /* the printed side of the label */
+  .disc-mark {
+    position: absolute;
+    top: 21%;
+    width: 27%;
+    height: auto;
+    filter: drop-shadow(0 2px 4px rgba(38, 22, 110, 0.18));
+  }
+
+  /* and the bit somebody wrote on afterwards */
   .scrawl {
-    position: relative;
+    position: absolute;
+    top: 63%;
     z-index: 1;
+    width: 74%;
     font-family: var(--marker);
     font-weight: 700;
-    font-size: clamp(1rem, 2.1vw, 1.36rem);
-    line-height: 1.02;
+    font-size: clamp(0.92rem, 1.9vw, 1.2rem);
+    line-height: 1;
     text-align: center;
     color: #2c1c63;
-    transform: rotate(-3deg) translateY(-28%);
+    transform: rotate(-3deg);
   }
 
   /* the hub, punched through the middle of the label */
@@ -925,6 +1134,14 @@
        has been read */
     .figure { grid-row: 1; }
     .helps { grid-template-columns: minmax(0, 1fr); }
+    /* the chevrons only make sense across a row, so the stacked version
+       drops them rather than pointing them at nothing */
+    .moves { grid-template-columns: minmax(0, 1fr); }
+    .hc { grid-template-columns: minmax(0, 1fr); }
+    .hc-art img { max-width: 190px; }
+    .move + .move::before { display: none; }
+    .move { padding: 18px 18px 20px; }
+    .move p { max-width: none; }
     .closer { grid-template-columns: minmax(0, 1fr); text-align: center; }
     .closer h2 { max-width: none; }
     .closer-sub { margin-inline: auto; }
@@ -938,9 +1155,9 @@
     .band { padding: 14px 17px 10px; gap: 10px; }
     /* on a phone the band has room for the name and one link, and that is it */
     .kicker { display: none; }
-    .step { grid-template-columns: 36px minmax(0, 1fr); gap: 12px; padding: 13px 15px 15px; }
-    .step-n { width: 36px; height: 36px; font-size: 0.74rem; }
-    .steps-cta { margin-left: 0; }
     .qa-a { padding: 0 18px 16px; }
+    /* Unit drops to 17px of padding on a phone, so the footer band has to
+       reach further out to stay flush with the panel edge */
+    .fine { margin: 20px -17px -20px; padding: 13px 17px 15px; font-size: 0.7rem; gap: 6px 18px; }
   }
 </style>

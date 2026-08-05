@@ -263,30 +263,26 @@
     color: var(--ink-3);
   }
 
-  /* the price is the hours you shipped, so it gets the warm bubble */
+  /* the price is the hours you shipped: a number, not a badge */
   .cost {
-    display: inline-flex;
+    display: flex;
     align-items: baseline;
     gap: 5px;
-    justify-self: start;
-    margin-top: 11px;
-    padding: 5px 14px 6px;
-    border-radius: var(--r-pill);
-    background: #fff1e2;
+    margin-top: 12px;
   }
   .cost-n {
     font-family: var(--display);
     font-weight: 700;
-    font-size: 1.24rem;
+    font-size: 1.5rem;
     line-height: 1;
+    letter-spacing: -0.02em;
     color: var(--ember-lo);
   }
-  .cost-u { font-size: 0.6rem; color: #b96a12; }
+  .cost-u { font-size: 0.62rem; color: var(--ink-3); }
 
   .meta { margin-top: 8px; min-height: 1.1em; font-size: 0.58rem; }
 
   .card.sold-out .thumb { opacity: 0.5; }
-  .card.sold-out .cost { background: var(--cloud-3); }
   .card.sold-out .cost-n { color: var(--ink-3); }
 
   .msg { margin: 8px 2px; color: var(--ink-2); }
