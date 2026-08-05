@@ -1,14 +1,16 @@
 <script>
-  // Every section is a cloud with a header band across the top: a numbered
-  // bubble, a name, and the port the thing on that band would actually listen
-  // on. 8096 is Jellyfin, 32400 is Plex. Anyone who has run a server reads it
-  // instantly, and it says more than a decorative divider would.
+  // Every section is a white panel on the ground: a title in the left column,
+  // the one line of context in the right, then the body. Same shape every
+  // time, so the reader stops noticing it after the second section.
   //
-  //   <Unit n="01" title="The ledger" port="8096" sub="…">…</Unit>
+  // The header used to carry a port number as a badge. Ports are real
+  // information, so they moved to the bill where they say something true about
+  // a machine, rather than sitting on "Questions" as decoration.
+  //
+  //   <Unit id="shop" title="The shop" sub="…" cta="Full shop" href="…">…</Unit>
   let {
     title = '',
     sub = '',
-    port = '',
     cta = '',
     href = '',
     id = '',
@@ -16,17 +18,19 @@
   } = $props()
 </script>
 
-<section class="unit cloud" {id}>
-  <header class="band">
+<section class="unit panel" {id}>
+  <div class="head">
     <h2>{title}</h2>
-    {#if port}<span class="pill port">:{port}</span>{/if}
-    {#if cta && href}
-      <a class="btn-text go" {href} data-analytics="CTA: Click" data-analytics-placement="unit-{id}">
-        {cta}
-      </a>
-    {/if}
-    {#if sub}<p class="sub">{sub}</p>{/if}
-  </header>
+
+    <div class="aside">
+      {#if sub}<p class="sub">{sub}</p>{/if}
+      {#if cta && href}
+        <a class="btn-text" {href} data-analytics="CTA: Click" data-analytics-placement="unit-{id}">
+          {cta}
+        </a>
+      {/if}
+    </div>
+  </div>
 
   <div class="body">
     {@render children()}
@@ -34,39 +38,32 @@
 </section>
 
 <style>
-  .unit { overflow: hidden; }
+  .unit { padding: clamp(26px, 3.6vw, 44px) clamp(22px, 3vw, 40px); }
 
-  .band {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-    padding: 18px 24px 16px;
-    background: linear-gradient(180deg, #f2f1ff 0%, rgba(242, 241, 255, 0) 100%);
+  .head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: clamp(14px, 3vw, 48px);
   }
 
   h2 {
-    font-size: 1.42rem;
-    font-weight: 600;
+    font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+    max-width: 13ch;
   }
 
-  .port { flex: 0 0 auto; }
-  .go { margin-left: auto; }
+  .aside { display: grid; justify-items: start; gap: 14px; }
 
   .sub {
-    flex-basis: 100%;
-    margin-top: 2px;
-    font-size: 0.98rem;
+    font-size: 1.02rem;
+    line-height: 1.5;
     color: var(--ink-2);
-    max-width: 68ch;
+    max-width: 54ch;
   }
 
-  .body { padding: 6px 24px 26px; }
+  .body { margin-top: clamp(26px, 3.5vw, 42px); }
 
-  @media (max-width: 640px) {
-    .band { padding: 15px 17px 13px; gap: 11px; }
-    h2 { font-size: 1.28rem; }
-    .body { padding: 4px 17px 20px; }
-    .go { margin-left: 0; }
+  @media (max-width: 800px) {
+    .head { grid-template-columns: minmax(0, 1fr); }
+    h2 { max-width: none; }
   }
 </style>

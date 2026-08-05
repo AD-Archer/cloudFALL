@@ -1,11 +1,15 @@
 <script>
   // THE SIGNATURE. The program's own logo, a spiked cloud with one eye, drawn
-  // as a mass of soft bubbles that keeps coming apart. Puffs drift off the
-  // underside, fall, and pile into a warm heap at the bottom of the frame.
+  // as a mass of puffs that keeps coming apart. Puffs drift off the underside,
+  // fall, and pile into a heap at the bottom of the frame.
   //
   // The colour carries the argument: the cloud is white (theirs), a puff in
   // flight is pale blue (in transit), and a puff that has landed is ember
   // (yours). Fill the frame and it writes itself out as a volume.
+  //
+  // Every shape here is one flat colour. There is no gradient, no highlight
+  // and no shadow on this canvas: the motion is the whole idea, and the gloss
+  // that used to sit on top of it was only ever obscuring the shape.
   //
   //   <Fall height={400} />
   let { height = 400 } = $props()
@@ -30,6 +34,12 @@
   const FLAMES = [
     -172, -146, -124, -102, -80, -58, -34, -10, 12, 34, 58, 82, 108, 136
   ]
+
+  // one flat value per thing on the canvas, matching the tokens in app.css
+  const EMBER = '#ff9b3d'
+  const EMBER_HI = '#ffc98e'
+  const DRIFTING = '#b9c6ff'
+  const INK = '#1a1633'
 
   const inCloud = (x, y) =>
     LUMPS.some(([cx, cy, r]) => (x - cx) ** 2 + (y - cy) ** 2 < r * r)
@@ -60,7 +70,9 @@
           t: 0,
           // a puff on the underside goes first
           edge: !inCloud(x, y + CELL * 1.6),
-          r: CELL * (0.56 + ((x * 7 + y * 13) % 10) / 40)
+          // ≥ CELL/√2 or the square lattice shows through as gaps and the
+          // cloud reads as a bead curtain instead of one mass
+          r: CELL * (0.8 + ((x * 7 + y * 13) % 10) / 45)
         })
       }
     }
@@ -147,34 +159,38 @@
     const px = (v) => ox + v * scale
     const py = (v) => oy + v * scale
 
-    // every round thing on this canvas is the same object: a lit sphere
-    function bubble(x, y, r, top, bottom, alpha = 1) {
+    // Every round thing on this canvas is the same object: a lit sphere. The
+    // light is the illustration doing its job, not chrome. A puff with no
+    // shading is a circle, and a heap of circles is not a heap.
+    function puff(x, y, r, top, bottom, alpha = 1, spec = true) {
       const cx = px(x)
       const cy = py(y)
       const rr = r * scale
       ctx.globalAlpha = alpha
-      const g = ctx.createRadialGradient(cx - rr * 0.35, cy - rr * 0.4, rr * 0.1, cx, cy, rr)
+      const g = ctx.createRadialGradient(cx - rr * 0.34, cy - rr * 0.38, rr * 0.08, cx, cy, rr)
       g.addColorStop(0, top)
       g.addColorStop(1, bottom)
       ctx.fillStyle = g
       ctx.beginPath()
       ctx.arc(cx, cy, rr, 0, 7)
       ctx.fill()
-      ctx.globalAlpha = alpha * 0.85
-      ctx.fillStyle = 'rgba(255,255,255,0.85)'
-      ctx.beginPath()
-      ctx.arc(cx - rr * 0.34, cy - rr * 0.38, rr * 0.22, 0, 7)
-      ctx.fill()
+      if (spec) {
+        ctx.globalAlpha = alpha * 0.9
+        ctx.fillStyle = '#ffffff'
+        ctx.beginPath()
+        ctx.arc(cx - rr * 0.33, cy - rr * 0.37, rr * 0.2, 0, 7)
+        ctx.fill()
+      }
       ctx.globalAlpha = 1
     }
 
     function paint() {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      // flames behind the body, drawn as curves so nothing on this canvas has
-      // a sharp corner
+      // the spikes, drawn as curves so nothing on this canvas has a corner
       ctx.save()
       ctx.translate(px(52), py(39))
+      ctx.fillStyle = EMBER
       for (const deg of FLAMES) {
         const a = (deg * Math.PI) / 180
         const rx = 30 * scale
@@ -186,10 +202,6 @@
         const ay = Math.sin(a - spread) * ry
         const bx = Math.cos(a + spread) * rx
         const by = Math.sin(a + spread) * ry
-        const g = ctx.createLinearGradient(ax, ay, tipX, tipY)
-        g.addColorStop(0, '#ffbe6f')
-        g.addColorStop(1, '#f97d13')
-        ctx.fillStyle = g
         ctx.beginPath()
         ctx.moveTo(ax, ay)
         ctx.quadraticCurveTo(Math.cos(a - spread * 0.3) * rx * 1.28, Math.sin(a - spread * 0.3) * ry * 1.3, tipX, tipY)
@@ -199,22 +211,20 @@
       }
       ctx.restore()
 
-      // the cloud
+      // The cloud. No specular and barely any shading on the body: it is one
+      // mass, not fifty beads. The puffs only become individuals as they leave.
       for (const p of puffs) {
         if (p.on <= 0.02) continue
-        bubble(p.x, p.y, p.r, '#ffffff', '#dfe6ff', 0.3 + p.on * 0.7)
+        puff(p.x, p.y, p.r, '#ffffff', '#f4f6ff', 0.32 + p.on * 0.68, false)
       }
 
       // the eye: the one piece that never comes apart, and the reason the
-      // shape still reads as the logo once the body is half gone
-      ctx.globalAlpha = 1
+      // shape still reads as the logo once the body is half gone. Three flat
+      // discs and a stroke, which is exactly how the logo is drawn.
       const [ex, ey, er] = EYE
-      bubble(ex, ey, er, '#ffc078', '#f2820f')
-      ctx.fillStyle = '#fffdf8'
-      ctx.beginPath()
-      ctx.arc(px(ex), py(ey), er * scale * 0.54, 0, 7)
-      ctx.fill()
-      ctx.strokeStyle = '#2a1a5e'
+      puff(ex, ey, er, '#ffc078', '#f2820f', 1, false)
+      puff(ex, ey, er * 0.54, '#ffffff', '#fff6e8', 1, false)
+      ctx.strokeStyle = INK
       ctx.lineWidth = Math.max(1.2, scale * 0.42)
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
@@ -224,9 +234,9 @@
       ctx.lineTo(px(ex) - er * scale * 0.16, py(ey) + er * scale * 0.2)
       ctx.stroke()
 
-      // in transit
+      // in transit: the one thing on the canvas that is unmistakably a bubble
       for (const b of falling) {
-        bubble(b.x + Math.sin(b.wob) * 0.5, b.y, b.r, '#ffffff', '#a9bcff')
+        puff(b.x + Math.sin(b.wob) * 0.5, b.y, b.r, '#ffffff', DRIFTING)
       }
 
       // landed, and yours
@@ -234,30 +244,26 @@
         for (let h = 0; h < stack[i]; h++) {
           const top = h === stack[i] - 1
           const jitter = (((i * 31 + h * 17) % 7) - 3) * 0.12
-          bubble(
+          puff(
             colX(i) + jitter,
             FLOOR - h * CELL * 0.8 - CELL * 0.45,
             CELL * 0.52,
-            top ? '#ffe0bd' : '#ffc998',
-            top ? '#ffab5e' : '#f79445',
-            flush ? 0.2 + flush * 0.8 : 1
+            top ? EMBER_HI : '#ffc998',
+            top ? EMBER : '#f2820f',
+            flush ? 0.2 + flush * 0.8 : 1,
+            false
           )
         }
       }
 
-      // the shelf the heap sits on
-      const g = ctx.createLinearGradient(px(6), 0, px(W - 6), 0)
-      g.addColorStop(0, 'rgba(255,255,255,0)')
-      g.addColorStop(0.5, 'rgba(255,255,255,0.75)')
-      g.addColorStop(1, 'rgba(255,255,255,0)')
-      ctx.fillStyle = g
-      ctx.fillRect(px(6), py(FLOOR) + scale * 0.6, (W - 12) * scale, Math.max(1.5, scale * 0.5))
     }
 
     function resize() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
-      const w = wrap.clientWidth
-      const h = wrap.clientHeight
+      // the canvas, not the figure: the caption sits outside the drawing now
+      const w = canvas.clientWidth
+      const h = canvas.clientHeight
+      if (!w || !h) return
       canvas.width = Math.max(1, Math.round(w * dpr))
       canvas.height = Math.max(1, Math.round(h * dpr))
       scale = Math.min(w / W, h / H)
@@ -315,33 +321,29 @@
 </figure>
 
 <style>
+  /* no frame, no fill: the cloud comes apart in the page's own sky rather
+     than inside a picture of one */
+  /* a column, not a stack of percentages: the canvas takes whatever the
+     caption does not, so hiding the caption gives its height back */
   .fall {
-    position: relative;
+    display: flex;
+    flex-direction: column;
     margin: 0;
     width: 100%;
     /* on a phone 400px of sky is most of the first screen, so the frame
        shrinks with the viewport instead of pushing the headline off it */
-    height: min(var(--h), 46vw + 158px);
-    border-radius: var(--r);
-    background:
-      radial-gradient(120% 80% at 78% 0%, rgba(255, 214, 170, 0.55) 0%, transparent 58%),
-      linear-gradient(180deg, #6455f5 0%, #8b9bff 58%, #c3d8ff 100%);
-    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.45), inset 0 -3px 0 rgba(60, 40, 160, 0.18);
-    overflow: hidden;
+    height: min(var(--h), 44vw + 150px);
   }
 
-  canvas { width: 100%; height: 100%; }
+  canvas { flex: 1; min-height: 0; width: 100%; }
 
   figcaption {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 12px;
+    padding-top: 8px;
     text-align: center;
-    font-family: var(--display);
-    font-weight: 500;
-    font-size: 0.92rem;
-    color: rgba(255, 255, 255, 0.88);
-    text-shadow: 0 1px 4px rgba(30, 18, 90, 0.4);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--on-sky-2);
   }
 </style>

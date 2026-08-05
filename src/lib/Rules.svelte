@@ -19,8 +19,8 @@
 
 <ol class="checks">
   {#if typeof aiPercent === 'number'}
-    <li class="check live">
-      <span class="pill pill-blush">AI CAP</span>
+    <li class="check">
+      <span class="pill">AI cap</span>
       <p>
         At most <mark>{aiPercent}%</mark> of the project can be AI-assisted, and you only get
         credit for the hours you actually worked.
@@ -29,8 +29,8 @@
   {/if}
 
   {#if requirements}
-    <li class="check live">
-      <span class="pill pill-blush">PROGRAM</span>
+    <li class="check">
+      <span class="pill">Program</span>
       <p>{requirements}</p>
     </li>
   {/if}
@@ -46,41 +46,36 @@
 </ol>
 
 <style>
-  .checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .checks { list-style: none; margin: 0; padding: 0; display: grid; }
 
   .check {
     display: grid;
-    grid-template-columns: 112px minmax(0, 1fr);
-    gap: 16px;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 24px;
     align-items: baseline;
-    padding: 14px 18px 15px;
-    border-radius: var(--r);
-    background: var(--cloud-2);
-    transition: background 0.2s, box-shadow 0.24s var(--ease-out);
+    padding: 18px 0;
+    border-top: 1px solid var(--rule);
   }
-  .check:hover { background: #fff; box-shadow: var(--lift-sm); }
+  .check:last-child { border-bottom: 1px solid var(--rule); }
 
-  .pill { justify-self: start; }
+  .pill { justify-self: start; padding-top: 4px; }
 
-  p {
-    font-size: 1rem;
-    line-height: 1.55;
-    color: var(--ink);
-    max-width: 74ch;
-  }
+  p { max-width: 70ch; }
 
-  /* the highlight is a soft warm bubble around the phrase, not a hard mark */
+  /* the phrase that decides whether a submission comes back. An underline in
+     the accent, not a filled bubble around it: the emphasis belongs to the
+     words, not to a shape drawn behind them. */
   mark {
-    padding: 1px 9px 2px;
-    border-radius: var(--r-pill);
-    color: var(--ember-ink);
-    background: linear-gradient(180deg, #ffe4c4 0%, #ffd2a0 100%);
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
+    background: none;
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--ember);
+    text-decoration-thickness: 2.5px;
+    text-underline-offset: 4px;
   }
 
   @media (max-width: 640px) {
-    .check { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 13px 15px 14px; }
-    p { font-size: 0.96rem; }
+    .check { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    .pill { padding-top: 0; }
   }
 </style>

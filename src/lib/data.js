@@ -80,20 +80,11 @@ export const RENTALS = [
     how: "Every photo and backup your phone makes, landing on a drive in your house, with no account standing in the middle of it.",
   },
   {
-    id: "tv",
-    brand: "max",
-    swapBrand: "jellyfin",
-    service: "Max",
-    what: "Ad-free, one household",
-    usd: 16.99,
-    replacement: "Jellyfin",
-    port: "8096",
-    how: "The same box you built for the last one. A second streaming service is just another shelf on it.",
-  },
-  {
     id: "games",
     brand: null,
-    glyph: "cube",
+    // Minecraft has no Simple Icons mark, so this one is a real image served
+    // from public/ rather than an inlined path. See `img` in Ledger.svelte.
+    img: "/brands/minecraft.png",
     swapBrand: null,
     service: "Minecraft Realms",
     what: "Realms Plus, ten players",
@@ -170,6 +161,20 @@ export const RENTALS = [
     how: "Not every subscription is software. A written plan, a log you own and a bar in the garage counts here too.",
   },
 ];
+
+/**
+ * Who is running this, and what they think. The masthead carries no wordmark
+ * any more, so this is where the program says its own name at the size it
+ * deserves, and it is the one place that states outright the belief the rest
+ * of the page is arguing from.
+ */
+export const WHO = {
+  eyebrow: "Who we are",
+  line:
+    "The cloud is just someone else's computer. We are a Hack Club program for " +
+    "teenagers who would rather own the thing than rent it.",
+  facts: ["run by teenagers", "free to enter", "open source only"],
+};
 
 /**
  * The whole program is three moves. Making an account and tracking hours are

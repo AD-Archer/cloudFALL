@@ -1,70 +1,58 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fredoka:wght@500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400&display=swap');
 
 /* ══════════════════════════════════════════════════════════════════
-   CLOUDFALL house system: a daydream sky.
+   CLOUDFALL house system: flat sky.
 
-   Everything soft. Panels are clouds, not cards: white, deeply
-   rounded, lit from the top, floating on a violet sky with a warm
-   glow where the logo's spikes catch the light. Nothing here has a
-   hard edge, a hard shadow or a right angle.
+   The identity is unchanged: violet sky, a spiked cloud coming apart,
+   everything a little round. What is gone is the finish on it. No
+   gradients, no glows, no lift shadows, no hover animation. A colour
+   is one colour. A surface is one surface.
 
-   Three colours do all the work:
-     violet   the sky, structure, links
-     ember    heat, prices, the thing you press
-     blush    sparkle, highlights, small delights
+   The page is the argument's own shape: it starts as sky, the cloud
+   falls out of it, and everything below the fold is ground you own.
+
+     violet   the sky, and only the sky
+     ember    the cloud's spikes, the price of a thing, the action
+     ink      everything you read
    ══════════════════════════════════════════════════════════════════ */
 
 :root {
   /* sky */
-  --sky-hi: #4c3ae8;
-  --sky-mid: #7f92ff;
-  --sky-lo: #c6dcff;
-  --violet: #5b4bff;
-  --violet-lo: #efeeff;
+  --sky: #5341f0;
 
-  /* heat, straight off the logo's spikes */
+  /* ground */
+  --paper: #efeef9;
+  --panel: #ffffff;
+  --rule: #dedcf0;
+  --rule-2: #c9c5e6;
+
+  /* ink, on ground */
+  --ink: #1a1633;
+  --ink-2: #5a5580;
+  --ink-3: #6f6b96;
+
+  /* ink, on sky */
+  --on-sky: #ffffff;
+  --on-sky-2: rgba(255, 255, 255, 0.72);
+
+  /* heat, straight off the logo's spikes. Three values because orange
+     needs a different weight on white than it does on violet, and the
+     graphics need the pure one. */
   --ember: #ff9b3d;
-  --ember-hi: #ffbc72;
-  --ember-lo: #ef7a12;
-  --ember-ink: #4a2200;
+  --ember-ink: #b84e06;
+  --ember-sky: #ffb05c;
 
-  /* sparkle */
-  --blush: #ff8ec4;
-  --blush-lo: #ffe4f2;
-
-  /* cloud surfaces */
-  --cloud: #ffffff;
-  --cloud-2: #f4f7ff;
-  --cloud-3: #e6ecff;
-
-  /* ink, on cloud */
-  --ink: #241a5c;
-  --ink-2: #5a5192;
-  --ink-3: #8f88bd;
-
-  --sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
-  --display: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --display: 'Fredoka', ui-sans-serif, system-ui, sans-serif;
+  --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
   --mono: 'DM Mono', ui-monospace, monospace;
-  --marker: 'Caveat', 'Bradley Hand', cursive;
 
   --maxw: 1120px;
-  --pad: clamp(14px, 4vw, 32px);
+  --pad: clamp(18px, 4.5vw, 40px);
+  /* the space between sections carries the calm; nothing else has to */
+  --gap: clamp(38px, 5.5vw, 72px);
 
-  /* everything is round */
-  --r-xl: 34px;
-  --r: 24px;
-  --r-sm: 15px;
-  --r-pill: 999px;
-
-  /* soft violet shade, never black */
-  --lift: 0 14px 34px rgba(38, 22, 110, 0.2), 0 2px 6px rgba(38, 22, 110, 0.1);
-  --lift-sm: 0 6px 16px rgba(38, 22, 110, 0.16);
-  --lift-lg: 0 26px 60px rgba(38, 22, 110, 0.26);
-  /* the inner rim that makes a white surface read as inflated */
-  --rim: inset 0 2px 0 rgba(255, 255, 255, 0.9), inset 0 -2px 0 rgba(90, 70, 190, 0.07);
-
-  --ease: cubic-bezier(0.34, 1.3, 0.5, 1);
-  --ease-out: cubic-bezier(0.2, 0.8, 0.3, 1);
+  --r: 20px;
+  --r-sm: 10px;
 }
 
 * { box-sizing: border-box; }
@@ -76,42 +64,36 @@ html {
 
 body {
   margin: 0;
-  min-height: 100%;
   color: var(--ink);
-  font-family: var(--sans);
-  font-size: 17px;
-  line-height: 1.62;
-  overflow-x: hidden;
+  background: var(--paper);
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  background-color: #6d7dff;
-  background-image:
-    radial-gradient(70% 44% at 78% 2%, rgba(255, 205, 150, 0.75) 0%, rgba(255, 190, 210, 0.2) 42%, transparent 68%),
-    radial-gradient(60% 40% at 12% 12%, rgba(255, 255, 255, 0.4) 0%, transparent 60%),
-    linear-gradient(178deg, var(--sky-hi) 0%, var(--sky-mid) 44%, var(--sky-lo) 100%);
-  background-attachment: fixed;
 }
 
-a { color: inherit; text-decoration: none; }
+a { color: inherit; }
 button { font-family: inherit; cursor: pointer; }
 img, svg { display: block; max-width: 100%; }
 
-::selection { background: var(--blush); color: #4a1030; }
+::selection { background: var(--ember); color: #3a1a00; }
 
 h1, h2, h3, h4 {
   margin: 0;
   font-family: var(--display);
   font-weight: 600;
-  line-height: 1.08;
-  letter-spacing: -0.01em;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
 }
 
 p { margin: 0; }
 
 :focus-visible {
-  outline: 3px solid var(--ember);
+  outline: 2px solid var(--ink);
   outline-offset: 3px;
-  border-radius: var(--r-sm);
 }
+/* on violet, an ink outline disappears */
+.on-sky :focus-visible { outline-color: var(--on-sky); }
 
 .wrap {
   width: 100%;
@@ -121,123 +103,109 @@ p { margin: 0; }
 }
 
 /* ── DATA VOICE ────────────────────────────────────────────────────
-   Ports, sizes, prices and statuses stay in mono. It is the one
-   un-soft thing on the page, and it is what stops a sky full of
-   bubbles from reading as a toy. */
+   Ports, prices, dates, statuses. The one un-round thing on the page,
+   and what stops a sky full of clouds from reading as a toy. */
 .mono {
   font-family: var(--mono);
   font-size: 0.72rem;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 
+/* A tag, not a badge: no fill, no border, no radius. It names the thing
+   beside it and then gets out of the way. */
 .pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px 5px;
-  border-radius: 8px;
   font-family: var(--mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--ink-2);
-  background: var(--violet-lo);
+  color: var(--ink-3);
+}
+.pill-ember { color: var(--ember-ink); }
+
+/* ── PANELS ───────────────────────────────────────────────────────
+   One surface: white, round, flat on the ground. The roundness is the
+   brand; the shadow it used to float on was not. */
+.panel {
+  border-radius: var(--r);
+  background: var(--panel);
 }
 
-.pill-ember { color: var(--ember-lo); background: #fff0e0; }
-.pill-blush { color: #c4407e; background: var(--blush-lo); }
-
-/* ── CLOUD SURFACES ───────────────────────────────────────────────
-   One surface: white, round, lit from above, floating. Sections are
-   built from <Unit>, which puts a header pill on top of one. */
-.cloud {
-  border-radius: var(--r-xl);
-  background: linear-gradient(180deg, var(--cloud) 0%, var(--cloud-2) 100%);
-  box-shadow: var(--lift), var(--rim);
-}
-
-/* ── BUTTONS ──────────────────────────────────────────────────────
-   The one crisp thing in a page of clouds. Capsules made every action
-   look like a game piece, so buttons keep a modest radius and a tight
-   shadow: the softness lives in the panels, not the controls. */
+/* ── BUTTONS ────────────────────────────────────────────────────── */
 .btn {
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  padding: 13px 24px;
-  border: none;
-  border-radius: 13px;
+  padding: 12px 22px;
+  border: 2px solid var(--ember);
+  border-radius: var(--r-sm);
+  background: var(--ember);
+  color: #3a1a00;
   font-family: var(--display);
   font-size: 1rem;
   font-weight: 600;
-  color: var(--ember-ink);
-  background: linear-gradient(180deg, #ffa851 0%, #ff8f2e 100%);
-  box-shadow: 0 5px 12px rgba(226, 130, 30, 0.24);
-  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease-out), background 0.2s;
+  text-decoration: none;
+  transition: background 0.15s linear, border-color 0.15s linear;
 }
+.btn:hover { background: #f2871f; border-color: #f2871f; }
 
-.btn:hover {
-  transform: translateY(-1px);
-  background: linear-gradient(180deg, #ffb264 0%, #ff9a41 100%);
-  box-shadow: 0 8px 18px rgba(226, 130, 30, 0.28);
-}
-.btn:active { transform: translateY(1px); box-shadow: 0 3px 8px rgba(226, 130, 30, 0.22); }
-
-.btn-soft {
+.btn-soft,
+.btn-ghost {
+  border-color: var(--rule-2);
+  background: none;
   color: var(--ink);
-  background: #fff;
-  box-shadow: 0 5px 12px rgba(38, 22, 110, 0.12), inset 0 0 0 1px rgba(120, 108, 210, 0.2);
 }
-.btn-soft:hover { box-shadow: 0 8px 18px rgba(38, 22, 110, 0.16), inset 0 0 0 1px rgba(120, 108, 210, 0.34); }
+.btn-soft:hover,
+.btn-ghost:hover { background: none; border-color: var(--ink); }
 
-.btn-sm { padding: 9px 16px; font-size: 0.88rem; border-radius: 11px; }
+.btn-sm { padding: 8px 15px; font-size: 0.9rem; }
 
-.btn:disabled { filter: grayscale(0.5); opacity: 0.55; cursor: not-allowed; transform: none; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-/* a link that grows a soft underline */
+/* an inline link that reads as a next step */
 .btn-text {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: 7px;
-  padding: 5px 2px;
   font-family: var(--display);
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--violet);
-  background-image: linear-gradient(var(--blush), var(--blush));
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 0% 3px;
-  border-radius: 3px;
-  transition: background-size 0.3s var(--ease-out), color 0.2s;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+  transition: color 0.15s linear;
 }
-.btn-text:hover { background-size: 100% 3px; color: var(--ink); }
+.btn-text:hover { color: var(--ember-ink); }
+
+.on-sky .btn-text { color: var(--on-sky); }
+.on-sky .btn-text:hover { color: var(--ember-sky); }
+.on-sky .btn-soft { border-color: rgba(255, 255, 255, 0.45); color: var(--on-sky); }
+.on-sky .btn-soft:hover { border-color: var(--on-sky); }
 
 /* ── CHIPS ───────────────────────────────────────────────────────── */
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .chip {
-  padding: 7px 14px;
-  border: none;
-  border-radius: 10px;
-  font-family: var(--display);
-  font-size: 0.84rem;
-  font-weight: 500;
+  padding: 6px 13px;
+  border: 1.5px solid var(--rule-2);
+  border-radius: var(--r-sm);
+  background: none;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
   color: var(--ink-2);
-  background: var(--violet-lo);
-  transition: transform 0.2s var(--ease), color 0.18s, background 0.18s, box-shadow 0.18s;
+  transition: border-color 0.15s linear, color 0.15s linear;
 }
-.chip:hover { color: var(--ink); background: var(--cloud-3); transform: translateY(-1px); }
+.chip:hover { border-color: var(--ink); color: var(--ink); }
 .chip.on {
-  color: #fff;
-  background: var(--violet);
-  box-shadow: 0 6px 14px rgba(91, 75, 255, 0.28);
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--panel);
 }
-.chip-n { margin-left: 6px; font-family: var(--mono); font-size: 0.8em; opacity: 0.7; }
+.chip-n { margin-left: 8px; opacity: 0.6; }
 
 /* ── SHOW MORE ─────────────────────────────────────────────────────
    Phones get a short grid and open the rest on request. Kept in CSS
@@ -245,43 +213,21 @@ p { margin: 0; }
 .more-row { display: none; }
 
 @media (max-width: 640px) {
-  .more-row { display: grid; justify-items: center; margin-top: 16px; }
+  .more-row { display: grid; justify-items: center; margin-top: 18px; }
   .grid.clipped > .card:nth-child(n + 7) { display: none; }
 }
 
-/* ── SCROLL REVEAL ────────────────────────────────────────────────
-   Panels drift up like something buoyant, so the page feels like it
-   settles rather than snaps. */
-.reveal {
-  opacity: 0;
-  transform: translateY(26px) scale(0.985);
-  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease);
-}
-.reveal.in { opacity: 1; transform: none; }
-
-/* ── SCROLLBAR ───────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 13px; }
-::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.22); }
-::-webkit-scrollbar-thumb {
-  border: 3px solid transparent;
-  background-clip: content-box;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: var(--r-pill);
-}
-::-webkit-scrollbar-thumb:hover { background-color: #fff; }
-
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   *,
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
-    scroll-behavior: auto;
   }
-  .reveal { opacity: 1; transform: none; }
 }
 
 @media (max-width: 520px) {
-  body { font-size: 16.5px; }
+  body { font-size: 17px; }
 }

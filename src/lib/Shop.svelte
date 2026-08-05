@@ -167,65 +167,68 @@
 {/if}
 
 <style>
-  .filters { justify-content: center; padding-bottom: 18px; }
+  .filters { padding-bottom: 24px; }
 
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(204px, 1fr));
-    gap: 16px;
+    gap: clamp(16px, 2.2vw, 26px);
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  .card {
-    border-radius: var(--r);
-    background: #fff;
-    box-shadow: var(--lift-sm), inset 0 0 0 1px rgba(38, 22, 110, 0.05);
-    overflow: hidden;
-    transition: transform 0.26s var(--ease), box-shadow 0.26s var(--ease-out);
-  }
-  .card:hover { transform: translateY(-5px) rotate(-0.5deg); box-shadow: var(--lift-lg); }
+  /* no card: the item sits on the panel it is already on. What separates one
+     from the next is the space between them. */
+  .tile { display: grid; grid-template-rows: auto 1fr; height: 100%; text-decoration: none; }
 
-  .tile { display: grid; grid-template-rows: auto 1fr; height: 100%; }
-
-  /* a pale plate, so a product photo shot on white does not sit in a halo */
+  /* a flat plate, so a product photo shot on white has something to sit on */
   .thumb {
     position: relative;
     display: grid;
     place-items: center;
     aspect-ratio: 5 / 4;
-    margin: 10px 10px 0;
     border-radius: var(--r-sm);
-    background: linear-gradient(180deg, #f7f5ff 0%, #eceaff 100%);
+    background: var(--paper);
   }
   /* absolute, not max-height: inside a grid row whose height comes from the
      aspect-ratio box, a percentage max-height resolves against nothing and
      every photo renders at its intrinsic size, blowing the card open */
   .thumb img {
     position: absolute;
-    inset: 12px;
-    width: calc(100% - 24px);
-    height: calc(100% - 24px);
+    inset: 14px;
+    width: calc(100% - 28px);
+    height: calc(100% - 28px);
     object-fit: contain;
     mix-blend-mode: multiply;
   }
+  /* an item with no photo yet. Faint enough to stay quiet, solid enough that
+     the plate does not just look broken. */
   .blank {
-    width: 46px;
-    height: 46px;
-    border: 2px dashed #c3bbf0;
+    width: 42px;
+    height: 42px;
+    border: 2px solid var(--ink-3);
     border-radius: 50%;
+    opacity: 0.4;
   }
 
-  .flag { position: absolute; top: 9px; right: 9px; box-shadow: var(--lift-sm); }
+  .flag {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 3px 8px 4px;
+    border-radius: 6px;
+    background: var(--ember);
+    color: #3a1a00;
+  }
 
   .card-body {
     display: grid;
     /* fixed rows, so a long name or a missing capacity line cannot make one
        card taller than its neighbours */
-    grid-template-rows: 2.6em auto auto;
+    grid-template-rows: 2.7em auto auto;
     align-content: start;
-    padding: 12px 15px 16px;
+    padding-top: 12px;
   }
 
   h3 {
@@ -234,11 +237,11 @@
     -webkit-line-clamp: 2;
     line-clamp: 2;
     overflow: hidden;
-    font-family: var(--sans);
-    font-size: 0.94rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 600;
     line-height: 1.3;
   }
+  .tile:hover h3 { text-decoration: underline; text-underline-offset: 3px; }
 
   .cap {
     display: flex;
@@ -246,9 +249,9 @@
     gap: 7px;
     min-height: 1.4em;
     margin-top: 4px;
-    font-size: 0.68rem;
+    font-size: 0.66rem;
   }
-  .cap-n { color: var(--violet); }
+  .cap-n { color: var(--ink-2); }
   .cap-b { color: var(--ink-3); font-size: 0.92em; }
   .blurb {
     display: -webkit-box;
@@ -256,8 +259,8 @@
     -webkit-line-clamp: 1;
     line-clamp: 1;
     overflow: hidden;
-    font-family: var(--sans);
-    font-size: 0.78rem;
+    font-family: var(--serif);
+    font-size: 0.86rem;
     text-transform: none;
     letter-spacing: 0;
     color: var(--ink-3);
@@ -272,34 +275,34 @@
   }
   .cost-n {
     font-family: var(--display);
-    font-weight: 700;
+    font-weight: 600;
     font-size: 1.5rem;
     line-height: 1;
     letter-spacing: -0.02em;
-    color: var(--ember-lo);
+    color: var(--ember-ink);
   }
-  .cost-u { font-size: 0.62rem; color: var(--ink-3); }
+  .cost-u { font-size: 0.6rem; color: var(--ink-3); }
 
   .meta { margin-top: 8px; min-height: 1.1em; font-size: 0.58rem; }
 
-  .card.sold-out .thumb { opacity: 0.5; }
+  .card.sold-out .thumb { opacity: 0.45; }
   .card.sold-out .cost-n { color: var(--ink-3); }
 
-  .msg { margin: 8px 2px; color: var(--ink-2); }
-  .msg a { color: var(--violet); text-decoration: underline; }
+  .msg { color: var(--ink-2); }
+  .msg a { color: var(--ink); }
   .link {
     padding: 0;
     border: none;
     background: none;
-    color: var(--violet);
+    color: var(--ink);
     font: inherit;
     text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   @media (max-width: 640px) {
-    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
-    .card-body { padding: 10px 12px 13px; }
-    h3 { font-size: 0.88rem; }
-    .cost-n { font-size: 1.1rem; }
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    h3 { font-size: 0.92rem; }
+    .cost-n { font-size: 1.2rem; }
   }
 </style>

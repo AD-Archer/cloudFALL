@@ -116,51 +116,53 @@
 {/if}
 
 <style>
-  .filters { justify-content: center; padding-bottom: 18px; }
+  .filters { padding-bottom: 24px; }
 
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(204px, 1fr));
-    gap: 16px;
+    gap: clamp(16px, 2.2vw, 26px);
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  .card {
-    border-radius: var(--r);
-    background: #fff;
-    box-shadow: var(--lift-sm), inset 0 0 0 1px rgba(38, 22, 110, 0.05);
-    overflow: hidden;
-    transition: transform 0.26s var(--ease), box-shadow 0.26s var(--ease-out);
-  }
-  /* only the ones that go somewhere get the lift: an idea with no link should
-     not pretend to be clickable */
-  .card.linked:hover { transform: translateY(-5px) rotate(-0.5deg); box-shadow: var(--lift-lg); }
-
-  .tile { display: grid; grid-template-rows: auto 1fr; height: 100%; }
+  .tile { display: grid; grid-template-rows: auto 1fr; height: 100%; text-decoration: none; }
 
   .thumb {
     position: relative;
     display: grid;
     place-items: center;
     aspect-ratio: 5 / 4;
-    margin: 10px 10px 0;
     border-radius: var(--r-sm);
-    background: linear-gradient(180deg, #f7f5ff 0%, #eceaff 100%);
+    background: var(--paper);
     overflow: hidden;
   }
   .thumb img {
     position: absolute;
-    inset: 10px;
-    width: calc(100% - 20px);
-    height: calc(100% - 20px);
-    object-fit: contain;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
-  .blank { width: 44px; height: 44px; border: 2px dashed #c3bbf0; border-radius: 50%; }
-  .flag { position: absolute; top: 9px; right: 9px; box-shadow: var(--lift-sm); }
+  .blank {
+    width: 42px;
+    height: 42px;
+    border: 2px solid var(--ink-3);
+    border-radius: 50%;
+    opacity: 0.4;
+  }
+  .flag {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 3px 8px 4px;
+    border-radius: 6px;
+    background: var(--ember);
+    color: #3a1a00;
+  }
 
-  .card-body { padding: 12px 15px 16px; }
+  .card-body { padding-top: 12px; }
 
   h3 {
     display: -webkit-box;
@@ -168,12 +170,14 @@
     -webkit-line-clamp: 2;
     line-clamp: 2;
     overflow: hidden;
-    min-height: 2.6em;
-    font-family: var(--sans);
-    font-size: 0.94rem;
-    font-weight: 700;
+    min-height: 2.7em;
+    font-size: 1rem;
+    font-weight: 600;
     line-height: 1.3;
   }
+  /* only the ones that go somewhere respond: an idea with no link should not
+     pretend to be clickable */
+  .card.linked .tile:hover h3 { text-decoration: underline; text-underline-offset: 3px; }
 
   .blurb {
     display: -webkit-box;
@@ -182,26 +186,26 @@
     line-clamp: 2;
     overflow: hidden;
     margin-top: 6px;
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     line-height: 1.45;
     color: var(--ink-2);
   }
 
   .foot { margin-top: 9px; min-height: 1.1em; font-size: 0.6rem; }
 
-  .msg { margin: 8px 2px; color: var(--ink-2); text-align: center; }
+  .msg { color: var(--ink-2); }
   .link {
     padding: 0;
     border: none;
     background: none;
-    color: var(--violet);
+    color: var(--ink);
     font: inherit;
     text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   @media (max-width: 640px) {
-    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
-    .card-body { padding: 10px 12px 13px; }
-    h3 { font-size: 0.88rem; }
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    h3 { font-size: 0.92rem; }
   }
 </style>
