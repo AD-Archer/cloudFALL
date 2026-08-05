@@ -1,11 +1,10 @@
 <script>
-  // Every section of the page is a unit in a stack you are assembling: a
-  // header rail bolted to a panel body. The rail carries an index, a name, and
-  // the port the thing on that rail would actually listen on 8096 is
-  // Jellyfin, 32400 is Plex. Anyone who has run a server reads it instantly,
-  // and it beats a decorative divider for the same width of page.
+  // Every section is a cloud with a header band across the top: a numbered
+  // bubble, a name, and the port the thing on that band would actually listen
+  // on. 8096 is Jellyfin, 32400 is Plex. Anyone who has run a server reads it
+  // instantly, and it says more than a decorative divider would.
   //
-  //   <Unit n="02" title="The ledger" port="8096" sub="…">…</Unit>
+  //   <Unit n="01" title="The ledger" port="8096" sub="…">…</Unit>
   let {
     n = '',
     title = '',
@@ -18,19 +17,17 @@
   } = $props()
 </script>
 
-<section class="unit" {id}>
-  <header class="rail">
-    <span class="n mono">{n}</span>
+<section class="unit cloud" {id}>
+  <header class="band">
+    {#if n}<span class="n">{n}</span>{/if}
     <h2>{title}</h2>
+    {#if port}<span class="pill port">:{port}</span>{/if}
+    {#if cta && href}
+      <a class="btn-text go" {href} data-analytics="CTA: Click" data-analytics-placement="unit-{id || n}">
+        {cta}
+      </a>
+    {/if}
     {#if sub}<p class="sub">{sub}</p>{/if}
-    <span class="right">
-      {#if port}<span class="port mono">:{port}</span>{/if}
-      {#if cta && href}
-        <a class="btn-text" {href} data-analytics="CTA: Click" data-analytics-placement="unit-{id || n}">
-          {cta} →
-        </a>
-      {/if}
-    </span>
   </header>
 
   <div class="body">
@@ -39,62 +36,53 @@
 </section>
 
 <style>
-  .unit {
-    border: 1px solid var(--rule);
-    border-radius: var(--r);
-    background: var(--panel);
-    box-shadow: var(--drop);
-    overflow: hidden;
-  }
+  .unit { overflow: hidden; }
 
-  .rail {
+  .band {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 11px 18px;
-    border-bottom: 1px solid var(--rule);
-    background: var(--panel-2);
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 18px 24px 16px;
+    background: linear-gradient(180deg, #f2f1ff 0%, rgba(242, 241, 255, 0) 100%);
   }
 
+  /* the index is a bubble, like everything else that carries a number here */
   .n {
-    flex: 0 0 auto;
-    font-size: 0.78rem;
-    color: var(--ember);
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    color: var(--ember-ink);
+    background: linear-gradient(180deg, var(--ember-hi) 0%, var(--ember) 100%);
+    box-shadow: 0 5px 12px rgba(215, 105, 10, 0.32), inset 0 2px 0 rgba(255, 255, 255, 0.7);
   }
 
   h2 {
-    flex: 0 0 auto;
-    font-size: 1.28rem;
-    letter-spacing: -0.025em;
+    font-size: 1.42rem;
+    font-weight: 600;
   }
+
+  .port { flex: 0 0 auto; }
+  .go { margin-left: auto; }
 
   .sub {
-    flex: 1 1 auto;
-    min-width: 0;
-    padding-left: 16px;
-    border-left: 1px solid var(--rule);
-    font-size: 0.92rem;
-    line-height: 1.45;
+    flex-basis: 100%;
+    margin-top: 2px;
+    font-size: 0.98rem;
     color: var(--ink-2);
-    max-width: 62ch;
+    max-width: 68ch;
   }
 
-  .right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-left: auto;
-    flex: 0 0 auto;
-  }
+  .body { padding: 6px 24px 26px; }
 
-  .port { font-size: 0.72rem; color: var(--ink-3); }
-
-  .body { padding: 20px 22px 24px; }
-
-  @media (max-width: 900px) {
-    .rail { flex-wrap: wrap; gap: 8px 14px; padding: 12px 16px; }
-    .sub { flex-basis: 100%; padding-left: 0; border-left: none; }
-    .right { margin-left: auto; order: -1; }
-    .body { padding: 16px 15px 20px; }
+  @media (max-width: 640px) {
+    .band { padding: 15px 17px 13px; gap: 11px; }
+    h2 { font-size: 1.28rem; }
+    .body { padding: 4px 17px 20px; }
+    .go { margin-left: 0; }
   }
 </style>

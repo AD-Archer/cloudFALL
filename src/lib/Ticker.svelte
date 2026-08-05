@@ -29,10 +29,12 @@
     z-index: 200;
     display: flex;
     align-items: center;
-    height: 34px;
+    height: 36px;
     overflow: hidden;
-    border-bottom: 1px solid var(--rule);
-    background: #08051a;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(10px) saturate(1.2);
+    -webkit-backdrop-filter: blur(10px) saturate(1.2);
+    box-shadow: 0 2px 14px rgba(38, 22, 110, 0.12);
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
   }
@@ -51,22 +53,23 @@
   .run li {
     display: flex;
     align-items: center;
-    padding-right: 26px;
+    padding-right: 24px;
     font-family: var(--mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.11em;
+    font-size: 0.66rem;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
     white-space: nowrap;
-    color: var(--ink-3);
+    color: var(--ink-2);
   }
 
-  /* an ember block between entries: the same square the cloud sheds */
+  /* a small warm bubble between entries */
   .run li::before {
     content: '';
-    width: 5px;
-    height: 5px;
-    margin-right: 26px;
-    background: var(--ember);
+    width: 6px;
+    height: 6px;
+    margin-right: 24px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, var(--ember-hi), var(--ember));
   }
 
   @keyframes slide {

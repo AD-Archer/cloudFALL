@@ -35,6 +35,8 @@ export const CONFIG = {
 export const RENTALS = [
   {
     id: "video",
+    brand: "netflix",
+    swapBrand: "jellyfin",
     service: "Netflix",
     what: "Standard, one household",
     usd: 17.99,
@@ -45,6 +47,8 @@ export const RENTALS = [
   },
   {
     id: "music",
+    brand: "spotify",
+    swapBrand: null,
     service: "Spotify",
     what: "Premium, one person",
     usd: 11.99,
@@ -55,6 +59,8 @@ export const RENTALS = [
   },
   {
     id: "photos",
+    brand: "googlephotos",
+    swapBrand: "immich",
     service: "Google Photos",
     what: "2 TB, the family plan",
     usd: 9.99,
@@ -65,6 +71,8 @@ export const RENTALS = [
   },
   {
     id: "files",
+    brand: "dropbox",
+    swapBrand: "nextcloud",
     service: "Dropbox",
     what: "Plus, 2 TB",
     usd: 11.99,
@@ -75,6 +83,8 @@ export const RENTALS = [
   },
   {
     id: "video-sub",
+    brand: "youtube",
+    swapBrand: null,
     service: "YouTube Premium",
     what: "One account, no ads",
     usd: 13.99,
@@ -85,6 +95,8 @@ export const RENTALS = [
   },
   {
     id: "books",
+    brand: "audible",
+    swapBrand: null,
     service: "Audible",
     what: "One credit a month",
     usd: 14.95,
@@ -95,6 +107,8 @@ export const RENTALS = [
   },
   {
     id: "passwords",
+    brand: "onepassword",
+    swapBrand: null,
     service: "1Password",
     what: "Individual",
     usd: 3.99,
@@ -105,6 +119,8 @@ export const RENTALS = [
   },
   {
     id: "gym",
+    brand: null,
+    swapBrand: null,
     service: "The gym",
     what: "The one you drive past",
     usd: 42.0,
@@ -184,6 +200,35 @@ export const RULES = {
     },
   ],
 };
+
+/**
+ * Self-hosting help. Most people signing up have never run a server, and the
+ * honest blocker is not the code, it is not knowing that an old laptop and one
+ * file is genuinely the whole setup. Every line here is something the Slack
+ * will walk you through.
+ */
+export const HELP = [
+  {
+    tag: "the box",
+    title: "You already own the hardware",
+    body: "A laptop with a cracked screen, a Raspberry Pi, the desktop in the basement. If it turns on and stays on, it can serve your house.",
+  },
+  {
+    tag: "the setup",
+    title: "One file starts the whole thing",
+    body: "Almost everything worth running ships a Docker Compose file. Paste it in, run one command, and the service is up. Ask in Slack and someone will read yours line by line.",
+  },
+  {
+    tag: "the network",
+    title: "Reach it from anywhere, safely",
+    body: "You do not need a static IP or a port forward. A mesh VPN like Tailscale puts your phone and your server on the same private network in about five minutes.",
+  },
+  {
+    tag: "the backup",
+    title: "Owning it means keeping it",
+    body: "Two copies, one of them somewhere else. That is what the blank discs in the shop are for, and it is the part people skip until they lose something.",
+  },
+];
 
 /** The terms of the deal, for anyone who has never done a YSWS before. */
 export const TERMS = [

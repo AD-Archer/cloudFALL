@@ -1,6 +1,6 @@
 <script>
-  // 404 and 500, in the page's own voice: this site is arguing that a service
-  // is a machine somebody runs, so its error pages talk like one.
+  // 404 and 500, in the page's own voice. This site argues that a service is a
+  // machine somebody runs, so its error pages talk like one.
   import { CONFIG } from './data.js'
 
   let {
@@ -17,32 +17,29 @@
 </svelte:head>
 
 <main class="shell wrap">
-  <section class="unit" aria-labelledby="status-title" data-analytics-section="status">
-    <header class="rail">
-      <span class="n mono">{code}</span>
-      <span class="mono eyebrow">{eyebrow}</span>
-      <a class="home mono" href="/">cloudfall.hackclub.com</a>
-    </header>
+  <section class="cloud panel" aria-labelledby="status-title" data-analytics-section="status">
+    <div class="figure" aria-hidden="true">
+      <img class="mark" src="/logo.png" alt="" width="150" height="130" />
+      <span class="code">{code}</span>
+    </div>
 
-    <div class="body">
-      <img class="mark" src="/logo.png" alt="" width="120" height="104" />
-      <div class="copy">
-        <h1 id="status-title">{title}</h1>
-        <p class="lede">{body}</p>
-        {#if detail}<p class="detail mono">{detail}</p>{/if}
-        <div class="actions">
-          <a class="btn" href="/" data-analytics="CTA: Click" data-analytics-placement="status-home">
-            Back to the front page
-          </a>
-          <a
-            class="btn btn-ghost"
-            href={CONFIG.slackUrl}
-            data-analytics="CTA: Click"
-            data-analytics-placement="status-slack"
-          >
-            Ask in Slack
-          </a>
-        </div>
+    <div class="copy">
+      <p class="pill pill-ember">{eyebrow}</p>
+      <h1 id="status-title">{title}</h1>
+      <p class="lede">{body}</p>
+      {#if detail}<p class="detail mono">{detail}</p>{/if}
+      <div class="actions">
+        <a class="btn" href="/" data-analytics="CTA: Click" data-analytics-placement="status-home">
+          Back to the front page
+        </a>
+        <a
+          class="btn btn-soft"
+          href={CONFIG.slackUrl}
+          data-analytics="CTA: Click"
+          data-analytics-placement="status-slack"
+        >
+          Ask in Slack
+        </a>
       </div>
     </div>
   </section>
@@ -56,47 +53,39 @@
     padding-block: clamp(60px, 12vw, 120px);
   }
 
-  .unit {
-    border: 1px solid var(--rule);
-    border-radius: var(--r);
-    background: var(--panel);
-    box-shadow: var(--drop);
-    overflow: hidden;
-  }
-
-  .rail {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 11px 18px;
-    border-bottom: 1px solid var(--rule);
-    background: var(--panel-2);
-  }
-  .n { font-size: 0.78rem; color: var(--ember); }
-  .eyebrow { font-size: 0.7rem; }
-  .home { margin-left: auto; font-family: var(--mono); font-size: 0.68rem; color: var(--ink-3); }
-  .home:hover { color: var(--ember); }
-
-  .body {
+  .panel {
     display: grid;
-    grid-template-columns: 130px minmax(0, 1fr);
+    grid-template-columns: 190px minmax(0, 1fr);
     align-items: center;
-    gap: clamp(20px, 4vw, 44px);
-    padding: clamp(24px, 4vw, 48px) clamp(20px, 3vw, 36px);
+    gap: clamp(20px, 4vw, 46px);
+    padding: clamp(26px, 4vw, 50px) clamp(22px, 3vw, 40px);
   }
 
-  .mark { width: 130px; height: auto; opacity: 0.9; }
+  .figure { position: relative; justify-self: center; }
+  .mark { width: 170px; height: auto; animation: bob 5s ease-in-out infinite alternate; }
+  .code {
+    position: absolute;
+    right: -6px;
+    bottom: -10px;
+    padding: 5px 14px 6px;
+    border-radius: var(--r-pill);
+    font-family: var(--mono);
+    font-size: 0.86rem;
+    color: #fff;
+    background: linear-gradient(180deg, #8375ff, var(--violet));
+    box-shadow: var(--lift-sm);
+  }
 
-  h1 { font-size: clamp(1.9rem, 4.4vw, 3rem); max-width: 16ch; }
+  h1 { margin-top: 14px; font-size: clamp(2rem, 4.4vw, 3.1rem); font-weight: 700; max-width: 16ch; }
   .lede { margin-top: 14px; font-size: 1.06rem; color: var(--ink-2); max-width: 48ch; }
 
   .detail {
     margin-top: 16px;
-    padding: 10px 12px;
-    border-left: 2px solid var(--ember);
-    background: var(--void);
+    padding: 12px 16px;
+    border-radius: var(--r-sm);
+    background: var(--cloud-2);
     color: var(--ink-2);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     text-transform: none;
     letter-spacing: 0.02em;
     overflow-wrap: anywhere;
@@ -105,8 +94,13 @@
 
   .actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px; }
 
+  @keyframes bob {
+    from { transform: translateY(-7px); }
+    to { transform: translateY(9px); }
+  }
+
   @media (max-width: 720px) {
-    .body { grid-template-columns: minmax(0, 1fr); }
-    .mark { width: 92px; }
+    .panel { grid-template-columns: minmax(0, 1fr); }
+    .mark { width: 118px; }
   }
 </style>

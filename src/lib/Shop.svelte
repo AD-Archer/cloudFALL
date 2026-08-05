@@ -109,7 +109,7 @@
             {:else}
               <span class="blank" aria-hidden="true"></span>
             {/if}
-            {#if p.isFeatured}<span class="tag tag-ember flag">pick</span>{/if}
+            {#if p.isFeatured}<span class="pill pill-ember flag">pick</span>{/if}
           </div>
 
           <div class="card-body">
@@ -167,47 +167,37 @@
 {/if}
 
 <style>
-  .filters {
-    padding-bottom: 16px;
-    margin-bottom: 18px;
-    border-bottom: 1px solid var(--rule-2);
-  }
+  .filters { justify-content: center; padding-bottom: 18px; }
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(204px, 1fr));
+    gap: 16px;
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
   .card {
-    border: 1px solid var(--rule);
     border-radius: var(--r);
-    background: var(--void);
-    box-shadow: var(--drop-sm);
+    background: #fff;
+    box-shadow: var(--lift-sm), inset 0 0 0 1px rgba(38, 22, 110, 0.05);
     overflow: hidden;
-    transition: transform 0.16s var(--ease), box-shadow 0.16s var(--ease), border-color 0.16s;
+    transition: transform 0.26s var(--ease), box-shadow 0.26s var(--ease-out);
   }
-  .card:hover {
-    transform: translate(-2px, -2px);
-    border-color: var(--sky);
-    box-shadow: var(--drop);
-  }
+  .card:hover { transform: translateY(-5px) rotate(-0.5deg); box-shadow: var(--lift-lg); }
 
   .tile { display: grid; grid-template-rows: auto 1fr; height: 100%; }
 
-  /* the plate is white: these are product photos shot on white, and floating
-     them on violet leaves every one of them in a grey halo */
+  /* a pale plate, so a product photo shot on white does not sit in a halo */
   .thumb {
     position: relative;
     display: grid;
     place-items: center;
     aspect-ratio: 5 / 4;
-    padding: 12px;
-    background: #f4f2ff;
-    border-bottom: 1px solid var(--rule);
+    margin: 10px 10px 0;
+    border-radius: var(--r-sm);
+    background: linear-gradient(180deg, #f7f5ff 0%, #eceaff 100%);
   }
   /* absolute, not max-height: inside a grid row whose height comes from the
      aspect-ratio box, a percentage max-height resolves against nothing and
@@ -223,19 +213,19 @@
   .blank {
     width: 46px;
     height: 46px;
-    border: 2px dashed #b9b0e8;
+    border: 2px dashed #c3bbf0;
     border-radius: 50%;
   }
 
-  .flag { position: absolute; top: 8px; right: 8px; background: #fff2e4; }
+  .flag { position: absolute; top: 9px; right: 9px; box-shadow: var(--lift-sm); }
 
   .card-body {
     display: grid;
     /* fixed rows, so a long name or a missing capacity line cannot make one
        card taller than its neighbours */
-    grid-template-rows: 2.5em auto auto;
+    grid-template-rows: 2.6em auto auto;
     align-content: start;
-    padding: 11px 12px 12px;
+    padding: 12px 15px 16px;
   }
 
   h3 {
@@ -244,11 +234,10 @@
     -webkit-line-clamp: 2;
     line-clamp: 2;
     overflow: hidden;
-    font-size: 0.92rem;
-    font-weight: 600;
     font-family: var(--sans);
-    line-height: 1.25;
-    letter-spacing: 0;
+    font-size: 0.94rem;
+    font-weight: 700;
+    line-height: 1.3;
   }
 
   .cap {
@@ -256,10 +245,10 @@
     align-items: baseline;
     gap: 7px;
     min-height: 1.4em;
-    margin-top: 5px;
+    margin-top: 4px;
     font-size: 0.68rem;
   }
-  .cap-n { color: #a293ff; }
+  .cap-n { color: var(--violet); }
   .cap-b { color: var(--ink-3); font-size: 0.92em; }
   .blurb {
     display: -webkit-box;
@@ -268,50 +257,53 @@
     line-clamp: 1;
     overflow: hidden;
     font-family: var(--sans);
-    font-size: 0.76rem;
+    font-size: 0.78rem;
     text-transform: none;
     letter-spacing: 0;
     color: var(--ink-3);
   }
 
+  /* the price is the hours you shipped, so it gets the warm bubble */
   .cost {
-    display: flex;
+    display: inline-flex;
     align-items: baseline;
     gap: 5px;
-    margin-top: 9px;
-    padding-top: 9px;
-    border-top: 1px solid var(--rule-2);
+    justify-self: start;
+    margin-top: 11px;
+    padding: 5px 14px 6px;
+    border-radius: var(--r-pill);
+    background: linear-gradient(180deg, #fff0e0 0%, #ffe2c6 100%);
   }
   .cost-n {
     font-family: var(--display);
-    font-weight: 800;
-    font-size: 1.5rem;
+    font-weight: 700;
+    font-size: 1.24rem;
     line-height: 1;
-    letter-spacing: -0.04em;
-    color: var(--ember);
+    color: var(--ember-lo);
   }
-  .cost-u { font-size: 0.64rem; color: var(--ink-3); }
+  .cost-u { font-size: 0.6rem; color: #b96a12; }
 
-  .meta { margin-top: 6px; min-height: 1.1em; font-size: 0.6rem; }
+  .meta { margin-top: 8px; min-height: 1.1em; font-size: 0.58rem; }
 
-  .card.sold-out .thumb { opacity: 0.45; }
+  .card.sold-out .thumb { opacity: 0.5; }
+  .card.sold-out .cost { background: var(--cloud-3); }
   .card.sold-out .cost-n { color: var(--ink-3); }
 
-  .msg { margin: 6px 2px; color: var(--ink-2); }
-  .msg a { color: var(--ember); text-decoration: underline; }
+  .msg { margin: 8px 2px; color: var(--ink-2); }
+  .msg a { color: var(--violet); text-decoration: underline; }
   .link {
     padding: 0;
     border: none;
     background: none;
-    color: var(--ember);
+    color: var(--violet);
     font: inherit;
     text-decoration: underline;
   }
 
   @media (max-width: 640px) {
-    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .card-body { padding: 9px 10px 11px; }
-    h3 { font-size: 0.86rem; }
-    .cost-n { font-size: 1.3rem; }
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+    .card-body { padding: 10px 12px 13px; }
+    h3 { font-size: 0.88rem; }
+    .cost-n { font-size: 1.1rem; }
   }
 </style>

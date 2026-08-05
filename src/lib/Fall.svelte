@@ -1,36 +1,35 @@
 <script>
-  // THE SIGNATURE. The program's own logo a spiked cloud with an eye
-  // drawn as a grid of blocks, coming apart from the bottom and falling into
-  // a volume that fills up underneath it.
+  // THE SIGNATURE. The program's own logo, a spiked cloud with one eye, drawn
+  // as a mass of soft bubbles that keeps coming apart. Puffs drift off the
+  // underside, fall, and pile into a warm heap at the bottom of the frame.
   //
-  // The colour carries the argument: the cloud is pale (theirs), a block in
-  // flight is violet (in transit), and a block that has landed is ember
-  // (yours). When the volume fills it flushes to disk and the counter ticks.
+  // The colour carries the argument: the cloud is white (theirs), a puff in
+  // flight is pale blue (in transit), and a puff that has landed is ember
+  // (yours). Fill the frame and it writes itself out as a volume.
   //
-  //   <Fall height={360} />
-  let { height = 360 } = $props()
+  //   <Fall height={400} />
+  let { height = 400 } = $props()
 
   let wrap = $state()
   let canvas = $state()
   let written = $state(0)
 
-  // world space; everything below is authored in these units and scaled to fit
+  // world space; everything is authored in these units and scaled to fit
   const W = 110
-  const H = 96
-  const CELL = 3.5
-  const FLOOR = 86
+  const H = 98
+  const CELL = 4.1
+  const FLOOR = 88
 
-  // The logo's cloud, as overlapping lumps: a flat-ish underside with four
-  // distinct lobes over the top, or it rasterises into a rectangle.
+  // the logo's cloud: a flat-ish underside under four fat lobes
   const LUMPS = [
-    [24, 44, 10], [33, 46, 12], [47, 47, 13], [62, 45, 12], [75, 43, 10],
-    [30, 37, 11], [42, 31, 14], [57, 29, 15], [70, 34, 12], [79, 39, 9]
+    [25, 45, 11], [35, 47, 13], [49, 48, 14], [64, 46, 13], [76, 44, 11],
+    [31, 37, 12], [43, 31, 15], [58, 29, 16], [71, 34, 13], [80, 40, 10]
   ]
-  const EYE = [70, 35, 7]
+  const EYE = [71, 35, 7.4]
 
-  // the spikes, by angle around the body
-  const SPIKES = [
-    -170, -142, -120, -98, -76, -54, -30, -8, 14, 36, 60, 84, 110, 140
+  // flames, not spikes: same silhouette as the logo, softer edges
+  const FLAMES = [
+    -172, -146, -124, -102, -80, -58, -34, -10, 12, 34, 58, 82, 108, 136
   ]
 
   const inCloud = (x, y) =>
@@ -48,19 +47,27 @@
     let last = 0
     let acc = 0
 
-    // ── the cloud, as cells ──────────────────────────────────────────
-    // `t` is a regrow timer: a detached cell fades back in, so the cloud is
-    // always coming apart and never actually runs out.
-    const cells = []
+    // ── the cloud, as puffs ──────────────────────────────────────────
+    // `t` is a regrow timer: a puff that drifts off fades back in later, so
+    // the cloud is always coming apart and never actually runs out.
+    const puffs = []
     for (let x = CELL; x < W; x += CELL) {
-      for (let y = CELL; y < FLOOR - 8; y += CELL) {
-        if (!inCloud(x + CELL / 2, y + CELL / 2)) continue
-        cells.push({ x, y, on: 1, t: 0, edge: !inCloud(x + CELL / 2, y + CELL * 1.9) })
+      for (let y = CELL; y < FLOOR - 10; y += CELL) {
+        if (!inCloud(x, y)) continue
+        puffs.push({
+          x,
+          y,
+          on: 1,
+          t: 0,
+          // a puff on the underside goes first
+          edge: !inCloud(x, y + CELL * 1.6),
+          r: CELL * (0.56 + ((x * 7 + y * 13) % 10) / 40)
+        })
       }
     }
 
-    const COLS = Math.floor((W - 12) / CELL)
-    const colX = (i) => 6 + i * CELL
+    const COLS = Math.floor((W - 14) / CELL)
+    const colX = (i) => 7 + i * CELL + CELL / 2
     let stack = new Array(COLS).fill(0)
     let flush = 0
 
@@ -68,28 +75,28 @@
     let shed = 0
 
     function detach() {
-      // shed from the underside first: the cloud melts downward, the way the
-      // logo's cloud is already breaking up along its bottom edge
-      const live = cells.filter((c) => c.on > 0.9)
+      const live = puffs.filter((p) => p.on > 0.9)
       if (!live.length) return
-      const pool = live.filter((c) => c.edge)
-      const c = (pool.length ? pool : live)[Math.floor(Math.random() * (pool.length || live.length))]
-      c.on = 0
-      c.t = 3.5 + Math.random() * 5
+      const pool = live.filter((p) => p.edge)
+      const from = pool.length ? pool : live
+      const p = from[Math.floor(Math.random() * from.length)]
+      p.on = 0
+      p.t = 3 + Math.random() * 5
       falling.push({
-        x: c.x,
-        y: c.y,
+        x: p.x,
+        y: p.y,
+        r: p.r * 0.86,
         vx: (Math.random() - 0.5) * 3,
-        vy: 2 + Math.random() * 6,
-        spin: Math.random() * 6
+        vy: 1 + Math.random() * 5,
+        wob: Math.random() * 6
       })
     }
 
-    function land(b) {
-      const i = Math.max(0, Math.min(COLS - 1, Math.round((b.x - 6) / CELL)))
+    function land(x) {
+      const i = Math.max(0, Math.min(COLS - 1, Math.round((x - 7) / CELL)))
       stack[i] += 1
-      // a column that towers over its neighbours spills sideways, so the
-      // volume fills flat instead of growing spikes
+      // a column that towers over its neighbours rolls off the side, so the
+      // heap settles flat instead of growing towers
       for (const j of [i - 1, i + 1]) {
         if (stack[j] !== undefined && stack[i] - stack[j] > 2) {
           stack[i] -= 1
@@ -100,14 +107,13 @@
     }
 
     function tick(dt) {
-      // regrow
-      for (const c of cells) {
-        if (c.on >= 1) continue
-        c.t -= dt
-        if (c.t <= 0) c.on = Math.min(1, c.on + dt * 0.9)
+      for (const p of puffs) {
+        if (p.on >= 1) continue
+        p.t -= dt
+        if (p.t <= 0) p.on = Math.min(1, p.on + dt * 0.8)
       }
 
-      shed += dt * 7
+      shed += dt * 5.5
       while (shed >= 1) {
         shed -= 1
         detach()
@@ -115,27 +121,23 @@
 
       const next = []
       for (const b of falling) {
-        b.vy += 62 * dt
+        b.vy += 48 * dt
         b.y += b.vy * dt
         b.x += b.vx * dt
-        b.spin += dt * 2
-        const col = Math.max(0, Math.min(COLS - 1, Math.round((b.x - 6) / CELL)))
-        if (b.y >= FLOOR - stack[col] * CELL - CELL) {
-          land(b)
-        } else {
-          next.push(b)
-        }
+        b.wob += dt * 3
+        const col = Math.max(0, Math.min(COLS - 1, Math.round((b.x - 7) / CELL)))
+        if (b.y >= FLOOR - stack[col] * CELL * 0.8 - CELL * 0.5) land(b.x)
+        else next.push(b)
       }
       falling = next
 
-      // full volume: write it out and start the next one
       if (flush > 0) {
-        flush -= dt * 1.6
+        flush -= dt * 1.4
         if (flush <= 0) {
           flush = 0
           stack = new Array(COLS).fill(0)
         }
-      } else if (stack.every((s) => s >= 5)) {
+      } else if (stack.every((s) => s >= 4)) {
         flush = 1
         written += 1
       }
@@ -145,94 +147,111 @@
     const px = (v) => ox + v * scale
     const py = (v) => oy + v * scale
 
-    function block(x, y, fill, alpha = 1) {
+    // every round thing on this canvas is the same object: a lit sphere
+    function bubble(x, y, r, top, bottom, alpha = 1) {
+      const cx = px(x)
+      const cy = py(y)
+      const rr = r * scale
       ctx.globalAlpha = alpha
-      ctx.fillStyle = fill
-      ctx.fillRect(px(x), py(y), CELL * scale * 0.88, CELL * scale * 0.88)
+      const g = ctx.createRadialGradient(cx - rr * 0.35, cy - rr * 0.4, rr * 0.1, cx, cy, rr)
+      g.addColorStop(0, top)
+      g.addColorStop(1, bottom)
+      ctx.fillStyle = g
+      ctx.beginPath()
+      ctx.arc(cx, cy, rr, 0, 7)
+      ctx.fill()
+      ctx.globalAlpha = alpha * 0.85
+      ctx.fillStyle = 'rgba(255,255,255,0.85)'
+      ctx.beginPath()
+      ctx.arc(cx - rr * 0.34, cy - rr * 0.38, rr * 0.22, 0, 7)
+      ctx.fill()
+      ctx.globalAlpha = 1
     }
 
     function paint() {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      // spikes, behind the body vector, not blocks, so the silhouette stays
-      // readable even as the cloud itself dissolves
+      // flames behind the body, drawn as curves so nothing on this canvas has
+      // a sharp corner
       ctx.save()
-      ctx.translate(px(51), py(39))
-      ctx.fillStyle = '#ff922e'
-      ctx.globalAlpha = 0.92
-      for (const deg of SPIKES) {
+      ctx.translate(px(52), py(39))
+      for (const deg of FLAMES) {
         const a = (deg * Math.PI) / 180
-        const rx = 31 * scale
-        const ry = 20 * scale
-        const w = 0.17
+        const rx = 30 * scale
+        const ry = 21 * scale
+        const spread = 0.19
+        const tipX = Math.cos(a) * rx * 1.5
+        const tipY = Math.sin(a) * ry * 1.55
+        const ax = Math.cos(a - spread) * rx
+        const ay = Math.sin(a - spread) * ry
+        const bx = Math.cos(a + spread) * rx
+        const by = Math.sin(a + spread) * ry
+        const g = ctx.createLinearGradient(ax, ay, tipX, tipY)
+        g.addColorStop(0, '#ffbe6f')
+        g.addColorStop(1, '#f97d13')
+        ctx.fillStyle = g
         ctx.beginPath()
-        ctx.moveTo(Math.cos(a - w) * rx, Math.sin(a - w) * ry)
-        ctx.lineTo(Math.cos(a) * rx * 1.42, Math.sin(a) * ry * 1.46)
-        ctx.lineTo(Math.cos(a + w) * rx, Math.sin(a + w) * ry)
+        ctx.moveTo(ax, ay)
+        ctx.quadraticCurveTo(Math.cos(a - spread * 0.3) * rx * 1.28, Math.sin(a - spread * 0.3) * ry * 1.3, tipX, tipY)
+        ctx.quadraticCurveTo(Math.cos(a + spread * 0.3) * rx * 1.28, Math.sin(a + spread * 0.3) * ry * 1.3, bx, by)
         ctx.closePath()
         ctx.fill()
       }
       ctx.restore()
-      ctx.globalAlpha = 1
 
       // the cloud
-      for (const c of cells) {
-        if (c.on <= 0.02) continue
-        block(c.x, c.y, '#dfe3ff', 0.25 + c.on * 0.75)
+      for (const p of puffs) {
+        if (p.on <= 0.02) continue
+        bubble(p.x, p.y, p.r, '#ffffff', '#dfe6ff', 0.3 + p.on * 0.7)
       }
 
-      // the eye: the one piece that never comes apart, and the only reason
-      // the shape still reads as the logo once the body is half gone. Reset
-      // the alpha first it is still carrying whatever the last cell faded to.
+      // the eye: the one piece that never comes apart, and the reason the
+      // shape still reads as the logo once the body is half gone
       ctx.globalAlpha = 1
       const [ex, ey, er] = EYE
+      bubble(ex, ey, er, '#ffc078', '#f2820f')
+      ctx.fillStyle = '#fffdf8'
       ctx.beginPath()
-      ctx.arc(px(ex), py(ey), er * scale, 0, 7)
-      ctx.fillStyle = '#ff922e'
+      ctx.arc(px(ex), py(ey), er * scale * 0.54, 0, 7)
       ctx.fill()
-      ctx.beginPath()
-      ctx.arc(px(ex), py(ey), er * scale * 0.55, 0, 7)
-      ctx.fillStyle = '#fffaf4'
-      ctx.fill()
-      ctx.strokeStyle = '#1a0f30'
-      ctx.lineWidth = Math.max(1, scale * 0.5)
+      ctx.strokeStyle = '#2a1a5e'
+      ctx.lineWidth = Math.max(1.2, scale * 0.42)
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
       ctx.beginPath()
-      ctx.moveTo(px(ex) - er * scale * 0.18, py(ey) - er * scale * 0.22)
-      ctx.lineTo(px(ex) + er * scale * 0.2, py(ey))
-      ctx.lineTo(px(ex) - er * scale * 0.18, py(ey) + er * scale * 0.22)
+      ctx.moveTo(px(ex) - er * scale * 0.16, py(ey) - er * scale * 0.2)
+      ctx.lineTo(px(ex) + er * scale * 0.19, py(ey))
+      ctx.lineTo(px(ex) - er * scale * 0.16, py(ey) + er * scale * 0.2)
       ctx.stroke()
 
       // in transit
       for (const b of falling) {
-        ctx.globalAlpha = 0.95
-        ctx.fillStyle = '#8f79ff'
-        ctx.save()
-        ctx.translate(px(b.x), py(b.y))
-        ctx.rotate(b.spin)
-        const s = CELL * scale * 0.84
-        ctx.fillRect(-s / 2, -s / 2, s, s)
-        ctx.restore()
+        bubble(b.x + Math.sin(b.wob) * 0.5, b.y, b.r, '#ffffff', '#a9bcff')
       }
-      ctx.globalAlpha = 1
 
-      // landed yours
+      // landed, and yours
       for (let i = 0; i < COLS; i++) {
         for (let h = 0; h < stack[i]; h++) {
           const top = h === stack[i] - 1
-          block(
-            colX(i),
-            FLOOR - (h + 1) * CELL,
-            top ? '#ffb266' : '#ff922e',
-            flush ? 0.25 + flush * 0.75 : 1
+          const jitter = (((i * 31 + h * 17) % 7) - 3) * 0.12
+          bubble(
+            colX(i) + jitter,
+            FLOOR - h * CELL * 0.8 - CELL * 0.45,
+            CELL * 0.52,
+            top ? '#ffd7a3' : '#ffb469',
+            top ? '#ff9b3d' : '#ef7a12',
+            flush ? 0.2 + flush * 0.8 : 1
           )
         }
       }
 
-      // the floor line the volume sits on
-      ctx.fillStyle = '#3a2b95'
-      ctx.fillRect(px(4), py(FLOOR) + 1, (W - 8) * scale, Math.max(1, scale * 0.55))
+      // the shelf the heap sits on
+      const g = ctx.createLinearGradient(px(6), 0, px(W - 6), 0)
+      g.addColorStop(0, 'rgba(255,255,255,0)')
+      g.addColorStop(0.5, 'rgba(255,255,255,0.75)')
+      g.addColorStop(1, 'rgba(255,255,255,0)')
+      ctx.fillStyle = g
+      ctx.fillRect(px(6), py(FLOOR) + scale * 0.6, (W - 12) * scale, Math.max(1.5, scale * 0.5))
     }
 
     function resize() {
@@ -252,7 +271,7 @@
       const dt = Math.min(0.05, (now - last) / 1000 || 0)
       last = now
       acc += dt
-      // fixed step, so a slow tab cannot fling blocks through the floor
+      // fixed step, so a slow tab cannot fling puffs through the floor
       while (acc > 1 / 60) {
         tick(1 / 60)
         acc -= 1 / 60
@@ -264,12 +283,10 @@
     resize()
 
     if (reduce) {
-      // one still frame: half the cloud gone, blocks in the air, volume part
-      // full. The argument survives without the motion.
-      for (let i = 0; i < 90; i++) tick(1 / 60)
-      for (let i = 0; i < 40; i++) {
-        land({ x: 6 + Math.random() * (W - 12) })
-      }
+      // one still frame: part of the cloud gone, puffs in the air, heap part
+      // built. The argument survives without the motion.
+      for (let i = 0; i < 80; i++) tick(1 / 60)
+      for (let i = 0; i < 34; i++) land(7 + Math.random() * (W - 14))
       paint()
     } else {
       last = performance.now()
@@ -290,13 +307,12 @@
   class="fall"
   bind:this={wrap}
   style="--h:{height}px"
-  aria-label="The CloudFALL cloud coming apart block by block. The blocks fall and stack up
-  into a volume of local storage underneath it."
+  aria-label="The CloudFALL cloud coming apart puff by puff. The puffs fall and pile up
+  into storage of your own underneath it."
 >
   <canvas bind:this={canvas} aria-hidden="true"></canvas>
   <figcaption class="mono">
     <span class="path">./media</span>
-    <span class="dot" aria-hidden="true">·</span>
     <span class="count">{written} volume{written === 1 ? '' : 's'} written</span>
   </figcaption>
 </figure>
@@ -306,9 +322,15 @@
     position: relative;
     margin: 0;
     width: 100%;
-    /* on a phone 400px of sky is most of the first screen, so the figure
+    /* on a phone 400px of sky is most of the first screen, so the frame
        shrinks with the viewport instead of pushing the headline off it */
-    height: min(var(--h), 44vw + 150px);
+    height: min(var(--h), 46vw + 158px);
+    border-radius: var(--r);
+    background:
+      radial-gradient(120% 80% at 78% 0%, rgba(255, 214, 170, 0.55) 0%, transparent 58%),
+      linear-gradient(180deg, #6455f5 0%, #8b9bff 58%, #c3d8ff 100%);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.45), inset 0 -3px 0 rgba(60, 40, 160, 0.18);
+    overflow: hidden;
   }
 
   canvas { width: 100%; height: 100%; }
@@ -317,15 +339,13 @@
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 2px;
+    bottom: 10px;
     display: flex;
     justify-content: center;
-    gap: 8px;
-    font-size: 0.68rem;
+    gap: 14px;
+    font-size: 0.64rem;
+    color: rgba(255, 255, 255, 0.7);
   }
 
-  .path { color: var(--ember); }
-  .dot { color: var(--ink-3); }
-  .count { color: var(--ink-3); }
-
+  .path { color: #ffd9ae; }
 </style>

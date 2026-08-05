@@ -14,7 +14,7 @@
 <dl class="facts">
   {#each TERMS as f}
     <div class="fact">
-      <dt class="mono">{f.term}</dt>
+      <dt class="pill">{f.term}</dt>
       <dd>{f.body}</dd>
     </div>
   {/each}
@@ -33,38 +33,37 @@
 </p>
 
 <style>
-  .facts { margin: 0; }
+  .facts { margin: 0; display: grid; gap: 8px; }
 
   /* the term column is fixed, so all four statements start on one axis and the
-     block reads as a plate of terms rather than four stacked paragraphs */
+     block reads as one plate rather than four stacked paragraphs */
   .fact {
     display: grid;
-    grid-template-columns: 132px minmax(0, 1fr);
-    gap: 20px;
+    grid-template-columns: 138px minmax(0, 1fr);
+    gap: 18px;
     align-items: baseline;
-    padding: 13px 2px;
-    border-top: 1px solid var(--rule-2);
+    padding: 14px 18px 15px;
+    border-radius: var(--r);
+    background: var(--cloud-2);
   }
-  .fact:first-child { border-top: none; }
-  .fact dt { font-size: 0.68rem; color: var(--ember); }
+  .fact dt { justify-self: start; }
   .fact dd { margin: 0; color: var(--ink-2); max-width: 68ch; }
 
   .tail {
     margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px solid var(--rule-2);
+    padding: 0 4px;
     color: var(--ink-3);
-    font-size: 0.92rem;
+    font-size: 0.94rem;
     max-width: 76ch;
   }
-  .tail a { color: var(--ink); box-shadow: inset 0 -1px 0 var(--ember); }
-  .tail a:hover { color: var(--ember); }
-  .tail .quiet { margin-left: 6px; color: var(--ink-3); box-shadow: none; }
-  .tail .quiet:hover { color: var(--ember); }
+  .tail a { color: var(--violet); font-weight: 700; }
+  .tail a:hover { color: var(--ink); }
+  .tail .quiet { margin-left: 6px; color: var(--ink-3); font-weight: 400; }
+  .tail .quiet:hover { color: var(--violet); }
 
   @media (max-width: 640px) {
     /* the term becomes an eyebrow above its statement; a fixed column would
        leave the text about twelve characters wide on a phone */
-    .fact { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .fact { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 13px 15px 14px; }
   }
 </style>

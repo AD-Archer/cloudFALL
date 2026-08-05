@@ -20,7 +20,7 @@
 <ol class="checks">
   {#if typeof aiPercent === 'number'}
     <li class="check live">
-      <span class="tag">AI CAP</span>
+      <span class="pill pill-blush">AI CAP</span>
       <p>
         At most <mark>{aiPercent}%</mark> of the project can be AI-assisted, and you only get
         credit for the hours you actually worked.
@@ -30,14 +30,14 @@
 
   {#if requirements}
     <li class="check live">
-      <span class="tag">PROGRAM</span>
+      <span class="pill pill-blush">PROGRAM</span>
       <p>{requirements}</p>
     </li>
   {/if}
 
   {#each items as item}
     <li class="check">
-      <span class="tag">{item.tag}</span>
+      <span class="pill">{item.tag}</span>
       <p>
         {#each parts(item) as p}{#if p.mark}<mark>{p.text}</mark>{:else}{p.text}{/if}{/each}
       </p>
@@ -46,23 +46,21 @@
 </ol>
 
 <style>
-  .checks { list-style: none; margin: 0; padding: 0; }
+  .checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 
   .check {
     display: grid;
-    grid-template-columns: 104px minmax(0, 1fr);
+    grid-template-columns: 112px minmax(0, 1fr);
     gap: 16px;
     align-items: baseline;
-    padding: 14px 4px;
-    border-top: 1px solid var(--rule-2);
+    padding: 14px 18px 15px;
+    border-radius: var(--r);
+    background: var(--cloud-2);
+    transition: background 0.2s, box-shadow 0.24s var(--ease-out);
   }
-  .check:first-child { border-top: none; }
+  .check:hover { background: #fff; box-shadow: var(--lift-sm); }
 
-  /* a live row came from Stern rather than this repo the violet tag is the
-     only tell, and it is deliberately quiet */
-  .live .tag { border-color: var(--sky); color: #a293ff; }
-
-  .tag { justify-self: start; }
+  .pill { justify-self: start; }
 
   p {
     font-size: 1rem;
@@ -71,15 +69,18 @@
     max-width: 74ch;
   }
 
+  /* the highlight is a soft warm bubble around the phrase, not a hard mark */
   mark {
-    padding: 0 2px;
-    color: var(--ember);
-    background: none;
-    box-shadow: inset 0 -2px 0 rgba(255, 146, 46, 0.45);
+    padding: 1px 9px 2px;
+    border-radius: var(--r-pill);
+    color: var(--ember-ink);
+    background: linear-gradient(180deg, #ffe4c4 0%, #ffd2a0 100%);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
   }
 
   @media (max-width: 640px) {
-    .check { grid-template-columns: minmax(0, 1fr); gap: 7px; }
+    .check { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 13px 15px 14px; }
     p { font-size: 0.96rem; }
   }
 </style>

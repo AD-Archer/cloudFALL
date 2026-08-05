@@ -1,61 +1,72 @@
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,600;12..96,75..100,800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap');
 
 /* ══════════════════════════════════════════════════════════════════
-   CLOUDFALL the house system.
+   CLOUDFALL house system: a daydream sky.
 
-   The brand is a hand-drawn cloud coming apart over a violet sky, so
-   the page is flat and poster-like: solid fills, 1px rules, hard
-   offset shadows, 4px corners. No gloss and no blur anywhere that
-   is deliberate, and it is what keeps a self-hosting page from
-   looking like the SaaS dashboards it is arguing against.
+   Everything soft. Panels are clouds, not cards: white, deeply
+   rounded, lit from the top, floating on a violet sky with a warm
+   glow where the logo's spikes catch the light. Nothing here has a
+   hard edge, a hard shadow or a right angle.
 
-   Depth comes from one device only: a hard, unblurred shadow cast
-   down-right, as if every panel were a sticker on the sky.
+   Three colours do all the work:
+     violet   the sky, structure, links
+     ember    heat, prices, the thing you press
+     blush    sparkle, highlights, small delights
    ══════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* the sky, straight off the program's accent */
-  --sky: #543efa;
-  --sky-lo: #2c1c93;
-  --void: #0a0620;
-  --night: #150e3d;
+  /* sky */
+  --sky-hi: #4c3ae8;
+  --sky-mid: #7f92ff;
+  --sky-lo: #c6dcff;
+  --violet: #5b4bff;
+  --violet-lo: #efeeff;
 
-  /* the spikes: the one warm colour, spent on prices, ports and actions */
-  --ember: #ff922e;
-  --ember-lo: #d96b0c;
+  /* heat, straight off the logo's spikes */
+  --ember: #ff9b3d;
+  --ember-hi: #ffbc72;
+  --ember-lo: #ef7a12;
+  --ember-ink: #4a2200;
 
-  /* type on violet, at three strengths */
-  --ink: #f2f0ff;
-  --ink-2: #b7afe6;
-  --ink-3: #7d74b8;
+  /* sparkle */
+  --blush: #ff8ec4;
+  --blush-lo: #ffe4f2;
 
-  /* panel faces + the hairlines that separate them */
-  --panel: #170f3d;
-  --panel-2: #1e1550;
-  --rule: #33257f;
-  --rule-2: #221768;
+  /* cloud surfaces */
+  --cloud: #ffffff;
+  --cloud-2: #f4f7ff;
+  --cloud-3: #e6ecff;
 
-  --sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --display: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif;
-  --mono: "DM Mono", ui-monospace, "SFMono-Regular", monospace;
+  /* ink, on cloud */
+  --ink: #241a5c;
+  --ink-2: #5a5192;
+  --ink-3: #8f88bd;
 
-  --maxw: 1140px;
-  --pad: clamp(14px, 4vw, 34px);
+  --sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  --display: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --mono: 'DM Mono', ui-monospace, monospace;
 
-  --r: 4px;
-  --r-sm: 3px;
+  --maxw: 1120px;
+  --pad: clamp(14px, 4vw, 32px);
 
-  /* the one depth device */
-  --drop: 5px 5px 0 rgba(4, 2, 16, 0.55);
-  --drop-sm: 3px 3px 0 rgba(4, 2, 16, 0.5);
-  --drop-lift: 9px 9px 0 rgba(4, 2, 16, 0.6);
+  /* everything is round */
+  --r-xl: 34px;
+  --r: 24px;
+  --r-sm: 15px;
+  --r-pill: 999px;
 
-  --ease: cubic-bezier(0.2, 0.75, 0.25, 1);
+  /* soft violet shade, never black */
+  --lift: 0 14px 34px rgba(38, 22, 110, 0.2), 0 2px 6px rgba(38, 22, 110, 0.1);
+  --lift-sm: 0 6px 16px rgba(38, 22, 110, 0.16);
+  --lift-lg: 0 26px 60px rgba(38, 22, 110, 0.26);
+  /* the inner rim that makes a white surface read as inflated */
+  --rim: inset 0 2px 0 rgba(255, 255, 255, 0.9), inset 0 -2px 0 rgba(90, 70, 190, 0.07);
+
+  --ease: cubic-bezier(0.34, 1.3, 0.5, 1);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.3, 1);
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html {
   scroll-behavior: smooth;
@@ -67,67 +78,38 @@ body {
   min-height: 100%;
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 16.5px;
-  line-height: 1.6;
+  font-size: 17px;
+  line-height: 1.62;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  /* a violet sky that darkens toward the ground: the cloud is falling
-     out of the top of the page and landing at the bottom of it */
-  background-color: var(--void);
+  background-color: #6d7dff;
   background-image:
-    radial-gradient(
-      90% 52% at 76% -12%,
-      rgba(124, 96, 255, 0.5) 0%,
-      transparent 62%
-    ),
-    radial-gradient(
-      70% 40% at 8% 4%,
-      rgba(84, 62, 250, 0.34) 0%,
-      transparent 60%
-    ),
-    linear-gradient(180deg, #2a1b8c 0%, #1a1152 34%, var(--void) 78%);
+    radial-gradient(70% 44% at 78% 2%, rgba(255, 205, 150, 0.75) 0%, rgba(255, 190, 210, 0.2) 42%, transparent 68%),
+    radial-gradient(60% 40% at 12% 12%, rgba(255, 255, 255, 0.4) 0%, transparent 60%),
+    linear-gradient(178deg, var(--sky-hi) 0%, var(--sky-mid) 44%, var(--sky-lo) 100%);
   background-attachment: fixed;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-button {
-  font-family: inherit;
-  cursor: pointer;
-}
-img,
-svg {
-  display: block;
-  max-width: 100%;
-}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+img, svg { display: block; max-width: 100%; }
 
-::selection {
-  background: var(--ember);
-  color: #21120a;
-}
+::selection { background: var(--blush); color: #4a1030; }
 
-h1,
-h2,
-h3,
-h4 {
+h1, h2, h3, h4 {
   margin: 0;
   font-family: var(--display);
-  font-weight: 800;
-  font-variation-settings: "wdth" 100;
-  line-height: 1.03;
-  letter-spacing: -0.022em;
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
 }
 
-p {
-  margin: 0;
-}
+p { margin: 0; }
 
 :focus-visible {
-  outline: 2px solid var(--ember);
+  outline: 3px solid var(--ember);
   outline-offset: 3px;
-  border-radius: 2px;
+  border-radius: var(--r-sm);
 }
 
 .wrap {
@@ -137,211 +119,158 @@ p {
   padding-inline: var(--pad);
 }
 
-/* ── DATA TYPE ──────────────────────────────────────────────────────
-   Everything a machine would print ports, sizes, prices, statuses
-   is set in mono, uppercase, wide. It is the page's second voice. */
+/* ── DATA VOICE ────────────────────────────────────────────────────
+   Ports, sizes, prices and statuses stay in mono. It is the one
+   un-soft thing on the page, and it is what stops a sky full of
+   bubbles from reading as a toy. */
 .mono {
   font-family: var(--mono);
-  font-size: 0.74rem;
-  letter-spacing: 0.09em;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 
-.tag {
+.pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 8px 4px;
-  border: 1px solid var(--rule);
-  border-radius: var(--r-sm);
+  padding: 4px 12px 5px;
+  border-radius: var(--r-pill);
   font-family: var(--mono);
   font-size: 0.66rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-2);
-  background: var(--panel-2);
+  background: var(--violet-lo);
 }
 
-.tag-ember {
-  border-color: rgba(255, 146, 46, 0.5);
-  color: var(--ember);
-  background: rgba(255, 146, 46, 0.1);
+.pill-ember { color: var(--ember-lo); background: #fff0e0; }
+.pill-blush { color: #c4407e; background: var(--blush-lo); }
+
+/* ── CLOUD SURFACES ───────────────────────────────────────────────
+   One surface: white, round, lit from above, floating. Sections are
+   built from <Unit>, which puts a header pill on top of one. */
+.cloud {
+  border-radius: var(--r-xl);
+  background: linear-gradient(180deg, var(--cloud) 0%, var(--cloud-2) 100%);
+  box-shadow: var(--lift), var(--rim);
 }
 
-/* ── PANELS ─────────────────────────────────────────────────────────
-   One surface, one border, one hard shadow. Sections are built from
-   <Unit>, which stacks a header rail on top of a panel body. */
-.panel {
-  border: 1px solid var(--rule);
-  border-radius: var(--r);
-  background: var(--panel);
-  box-shadow: var(--drop);
-}
-
-/* ── BUTTONS ────────────────────────────────────────────────────────
-   Poster buttons: solid fill, hard shadow, and a press that actually
-   travels the button moves into its own shadow. */
+/* ── BUTTONS ──────────────────────────────────────────────────────
+   Round, glossy, and squishy: press one and it compresses rather
+   than sliding, which is the whole point of a soft interface. */
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 13px 24px;
-  border: 1px solid #0d0620;
-  border-radius: var(--r);
+  gap: 9px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: var(--r-pill);
   font-family: var(--display);
-  font-size: 0.98rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: #21120a;
-  background: var(--ember);
-  box-shadow: var(--drop);
-  transition:
-    transform 0.14s var(--ease),
-    box-shadow 0.14s var(--ease),
-    background 0.14s;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--ember-ink);
+  background: linear-gradient(180deg, var(--ember-hi) 0%, var(--ember) 52%, var(--ember-lo) 100%);
+  box-shadow:
+    0 10px 22px rgba(215, 105, 10, 0.36),
+    inset 0 2px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -3px 0 rgba(150, 60, 0, 0.22);
+  transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease-out), filter 0.2s;
 }
 
-.btn:hover {
-  background: #ffa550;
-  box-shadow: var(--drop-lift);
-  transform: translate(-2px, -2px);
-}
+.btn:hover { transform: translateY(-2px) scale(1.02); filter: saturate(1.06) brightness(1.03); }
 .btn:active {
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  transform: translate(5px, 5px);
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 4px 10px rgba(215, 105, 10, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.6);
 }
 
-.btn-ghost {
+.btn-soft {
   color: var(--ink);
-  background: transparent;
-  border-color: var(--rule);
-}
-.btn-ghost:hover {
-  background: var(--panel-2);
-  border-color: var(--sky);
-}
-
-.btn-sm {
-  padding: 9px 16px;
-  font-size: 0.86rem;
+  background: linear-gradient(180deg, #ffffff 0%, var(--cloud-3) 100%);
+  box-shadow:
+    0 10px 22px rgba(38, 22, 110, 0.18),
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -3px 0 rgba(90, 70, 190, 0.1);
 }
 
-.btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-}
+.btn-sm { padding: 10px 18px; font-size: 0.9rem; }
 
-/* a link that underlines from the left on hover */
+.btn:disabled { filter: grayscale(0.5); opacity: 0.55; cursor: not-allowed; transform: none; }
+
+/* a link that grows a soft underline */
 .btn-text {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 6px 1px;
-  font-family: var(--mono);
-  font-size: 0.74rem;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--ink-2);
-  background-image: linear-gradient(var(--ember), var(--ember));
+  padding: 5px 2px;
+  font-family: var(--display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--violet);
+  background-image: linear-gradient(var(--blush), var(--blush));
   background-repeat: no-repeat;
   background-position: 0 100%;
-  background-size: 0% 1px;
-  transition:
-    background-size 0.28s var(--ease),
-    color 0.18s;
+  background-size: 0% 3px;
+  border-radius: 3px;
+  transition: background-size 0.3s var(--ease-out), color 0.2s;
 }
-.btn-text:hover {
-  background-size: 100% 1px;
-  color: var(--ember);
-}
+.btn-text:hover { background-size: 100% 3px; color: var(--ink); }
 
-/* ── FILTER CHIPS ───────────────────────────────────────────────── */
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-}
+/* ── CHIPS ───────────────────────────────────────────────────────── */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .chip {
-  padding: 6px 12px;
-  border: 1px solid var(--rule);
-  border-radius: var(--r-sm);
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  padding: 7px 15px;
+  border: none;
+  border-radius: var(--r-pill);
+  font-family: var(--display);
+  font-size: 0.84rem;
+  font-weight: 500;
   color: var(--ink-2);
-  background: var(--panel-2);
-  transition:
-    color 0.16s,
-    border-color 0.16s,
-    background 0.16s;
+  background: var(--violet-lo);
+  transition: transform 0.2s var(--ease), color 0.18s, background 0.18s, box-shadow 0.18s;
 }
-.chip:hover {
-  color: var(--ink);
-  border-color: var(--sky);
-}
+.chip:hover { color: var(--ink); background: var(--cloud-3); transform: translateY(-1px); }
 .chip.on {
-  color: #21120a;
-  border-color: #0d0620;
-  background: var(--ember);
-  box-shadow: var(--drop-sm);
+  color: #fff;
+  background: linear-gradient(180deg, #7b6dff 0%, var(--violet) 100%);
+  box-shadow: 0 6px 14px rgba(91, 75, 255, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.35);
 }
-.chip-n {
-  margin-left: 6px;
-  opacity: 0.7;
-}
+.chip-n { margin-left: 6px; font-family: var(--mono); font-size: 0.8em; opacity: 0.7; }
 
-/* ── SHOW MORE ──────────────────────────────────────────────────────
-   Phones get a short grid and open the rest on request. Kept in CSS so
-   nothing has to watch the viewport and a resize reveals the rest. */
-.more-row {
-  display: none;
-}
+/* ── SHOW MORE ─────────────────────────────────────────────────────
+   Phones get a short grid and open the rest on request. Kept in CSS
+   so nothing watches the viewport and a resize reveals the rest. */
+.more-row { display: none; }
 
 @media (max-width: 640px) {
-  .more-row {
-    display: grid;
-    justify-items: center;
-    margin-top: 14px;
-  }
-  .grid.clipped > .card:nth-child(n + 7) {
-    display: none;
-  }
+  .more-row { display: grid; justify-items: center; margin-top: 16px; }
+  .grid.clipped > .card:nth-child(n + 7) { display: none; }
 }
 
-/* ── SCROLL REVEAL ──────────────────────────────────────────────── */
+/* ── SCROLL REVEAL ────────────────────────────────────────────────
+   Panels drift up like something buoyant, so the page feels like it
+   settles rather than snaps. */
 .reveal {
   opacity: 0;
-  transform: translateY(16px);
-  transition:
-    opacity 0.6s var(--ease),
-    transform 0.6s var(--ease);
+  transform: translateY(26px) scale(0.985);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease);
 }
-.reveal.in {
-  opacity: 1;
-  transform: none;
-}
+.reveal.in { opacity: 1; transform: none; }
 
-/* ── SCROLLBAR ──────────────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 12px;
-}
-::-webkit-scrollbar-track {
-  background: #0d0828;
-}
+/* ── SCROLLBAR ───────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 13px; }
+::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.22); }
 ::-webkit-scrollbar-thumb {
   border: 3px solid transparent;
   background-clip: content-box;
-  background-color: #3a2b95;
-  border-radius: 99px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: var(--r-pill);
 }
-::-webkit-scrollbar-thumb:hover {
-  background-color: var(--sky);
-}
+::-webkit-scrollbar-thumb:hover { background-color: #fff; }
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -352,14 +281,9 @@ p {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto;
   }
-  .reveal {
-    opacity: 1;
-    transform: none;
-  }
+  .reveal { opacity: 1; transform: none; }
 }
 
 @media (max-width: 520px) {
-  body {
-    font-size: 16px;
-  }
+  body { font-size: 16.5px; }
 }
