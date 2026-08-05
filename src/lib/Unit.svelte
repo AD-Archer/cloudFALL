@@ -47,18 +47,18 @@
     background: linear-gradient(180deg, #f2f1ff 0%, rgba(242, 241, 255, 0) 100%);
   }
 
-  /* the index is a bubble, like everything else that carries a number here */
+  /* Pale, flat, quiet. A saturated orange puck with its own shadow shouted
+     over the heading it was supposed to be numbering. */
   .n {
     display: grid;
     place-items: center;
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     font-family: var(--mono);
-    font-size: 0.76rem;
-    color: var(--ember-ink);
-    background: linear-gradient(180deg, var(--ember-hi) 0%, var(--ember) 100%);
-    box-shadow: 0 5px 12px rgba(215, 105, 10, 0.32), inset 0 2px 0 rgba(255, 255, 255, 0.7);
+    font-size: 0.74rem;
+    color: #c96f14;
+    background: #ffeeda;
   }
 
   h2 {

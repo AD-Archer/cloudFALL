@@ -251,7 +251,7 @@
 
         <div class="hero-copy">
           <p class="pill pill-ember tagline">{CONFIG.tagline}</p>
-          <h1>Stop renting<br />your own stuff.</h1>
+          <h1>Stop renting<br />Own your stuff.</h1>
           <p class="lede">
             Your films, your music, your photos, your files. You pay every month for a copy
             you do not own, on a computer you cannot touch. Build the thing that replaces
@@ -277,12 +277,14 @@
               add up what you pay
             </a>
           </div>
-
-          <p class="readout mono">
-            {#each readout as bit}<span class="bit">{bit}</span>{/each}
-          </p>
         </div>
       </div>
+
+      <!-- the hero's own footer: what a status page would print about this
+           program, across the full width rather than tucked under the copy -->
+      <p class="readout">
+        {#each readout as bit}<span class="bit">{bit}</span>{/each}
+      </p>
     </section>
 
     <!-- ───────────────────────── LEDGER ───────────────────────── -->
@@ -632,15 +634,22 @@
   .readout {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px 16px;
-    margin-top: 22px;
-    font-size: 0.64rem;
+    justify-content: center;
+    gap: 8px 26px;
+    padding: 15px 24px 17px;
+    border-top: 1px solid var(--cloud-3);
+    background: rgba(244, 247, 255, 0.7);
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
   }
-  .bit { display: flex; align-items: center; gap: 9px; }
+  .bit { display: flex; align-items: center; gap: 10px; }
   .bit::before {
     content: '';
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: var(--blush);
   }
@@ -656,6 +665,8 @@
     border-radius: var(--r);
     background: var(--cloud-2);
   }
+  /* flat and pale: a numbered blob with a drop shadow on every step turned
+     the list into a row of buttons that could not be pressed */
   .step-n {
     display: grid;
     place-items: center;
@@ -664,9 +675,8 @@
     border-radius: 50%;
     font-family: var(--mono);
     font-size: 0.82rem;
-    color: #fff;
-    background: linear-gradient(180deg, #8375ff 0%, var(--violet) 100%);
-    box-shadow: 0 6px 14px rgba(91, 75, 255, 0.32), inset 0 2px 0 rgba(255, 255, 255, 0.4);
+    color: var(--violet);
+    background: #e7e5ff;
   }
   .step-copy h3 { padding-top: 6px; font-size: 1.14rem; }
   .step-copy p { margin-top: 6px; color: var(--ink-2); max-width: 68ch; }

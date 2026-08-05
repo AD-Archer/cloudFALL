@@ -14,9 +14,10 @@
 
   let { welcomeUrl = '' } = $props()
 
-  // start with the three almost everybody pays for, so the ground is never
-  // empty on arrival and the interaction has an example to copy
-  let popped = $state(new Set(RENTALS.filter((r) => r.on).map((r) => r.id)))
+  // Nothing is pre-selected. The number below is only worth anything if it is
+  // the visitor's own bill, and a page that guesses which three you pay for is
+  // just showing you its own arithmetic.
+  let popped = $state(new Set())
 
   let floating = $derived(RENTALS.filter((r) => !popped.has(r.id)))
   let landed = $derived(RENTALS.filter((r) => popped.has(r.id)))
@@ -37,7 +38,8 @@
   const DRIFT = [0, 30, 10, 38, 4, 26, 16, 34]
 
   const DEAREST = Math.max(...RENTALS.map((r) => r.usd))
-  const size = (usd) => Math.round(62 + 92 * Math.sqrt(usd / DEAREST))
+  // sized so all eight fit the widest row without one straggler wrapping
+  const size = (usd) => Math.round(58 + 84 * Math.sqrt(usd / DEAREST))
 
   function pop(r) {
     popped = new Set(popped).add(r.id)
@@ -203,7 +205,7 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 10px 18px;
+    gap: 10px 14px;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -231,19 +233,19 @@
     border: none;
     border-radius: 50%;
     background:
-      radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.86) 42%, rgba(233, 240, 255, 0.72) 100%);
+      radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.82) 52%, rgba(226, 234, 255, 0.6) 100%);
     box-shadow:
-      0 10px 22px rgba(40, 24, 120, 0.28),
-      inset 0 -6px 14px rgba(120, 130, 220, 0.28),
-      inset 0 5px 8px rgba(255, 255, 255, 0.95);
+      0 8px 18px rgba(40, 24, 120, 0.16),
+      inset 0 -5px 12px rgba(150, 160, 230, 0.16),
+      inset 0 3px 6px rgba(255, 255, 255, 0.85);
     transition: transform 0.24s var(--ease), box-shadow 0.24s var(--ease-out);
   }
   .bubble:hover {
-    transform: scale(1.07);
+    transform: scale(1.06);
     box-shadow:
-      0 16px 30px rgba(40, 24, 120, 0.32),
-      inset 0 -6px 14px rgba(120, 130, 220, 0.22),
-      inset 0 5px 8px rgba(255, 255, 255, 1);
+      0 12px 24px rgba(40, 24, 120, 0.2),
+      inset 0 -5px 12px rgba(150, 160, 230, 0.12),
+      inset 0 3px 6px rgba(255, 255, 255, 0.95);
   }
   .bubble:active { transform: scale(0.94); }
 
@@ -257,7 +259,7 @@
     height: 13%;
     border-radius: 50%;
     background: #fff;
-    opacity: 0.95;
+    opacity: 0.8;
     pointer-events: none;
   }
 

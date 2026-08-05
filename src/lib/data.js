@@ -28,6 +28,8 @@ export const CONFIG = {
  * instead. `usd` is a rough US list price, which the section says out loud;
  * the point of the number is the size of it, not the cent.
  *
+ * Nothing here is selected by default; see Ledger.svelte.
+ *
  * `port` is the port the replacement actually listens on. It is the closest
  * thing self-hosting has to a street address, and it is why a row reads as a
  * real machine you could go and build tonight.
@@ -40,7 +42,6 @@ export const RENTALS = [
     service: "Netflix",
     what: "Standard, one household",
     usd: 17.99,
-    on: true,
     replacement: "Jellyfin",
     port: "8096",
     how: "Rip the discs you own, stream them to every screen in the house. Nothing leaves the building.",
@@ -52,7 +53,6 @@ export const RENTALS = [
     service: "Spotify",
     what: "Premium, one person",
     usd: 11.99,
-    on: true,
     replacement: "Navidrome",
     port: "4533",
     how: "Your library, your playlists, subsonic apps on every phone. The album stays yours when the deal expires.",
@@ -64,7 +64,6 @@ export const RENTALS = [
     service: "Google Photos",
     what: "2 TB, the family plan",
     usd: 9.99,
-    on: true,
     replacement: "Immich",
     port: "2283",
     how: "Same auto-backup, same face search, running on a box in your room instead of a rack in Iowa.",
@@ -76,7 +75,6 @@ export const RENTALS = [
     service: "Dropbox",
     what: "Plus, 2 TB",
     usd: 11.99,
-    on: false,
     replacement: "Nextcloud",
     port: "443",
     how: "Files, calendar, contacts and shared links, without a company reading the folder names.",
@@ -88,7 +86,6 @@ export const RENTALS = [
     service: "YouTube Premium",
     what: "One account, no ads",
     usd: 13.99,
-    on: false,
     replacement: "TubeArchivist",
     port: "8000",
     how: "Subscribe to channels, keep the videos, watch them again in ten years when the channel is gone.",
@@ -100,7 +97,6 @@ export const RENTALS = [
     service: "Audible",
     what: "One credit a month",
     usd: 14.95,
-    on: false,
     replacement: "Audiobookshelf",
     port: "13378",
     how: "Your audiobooks with your progress synced, and no licence server deciding whether you may listen.",
@@ -112,7 +108,6 @@ export const RENTALS = [
     service: "1Password",
     what: "Individual",
     usd: 3.99,
-    on: false,
     replacement: "Vaultwarden",
     port: "8080",
     how: "The same browser extensions, talking to a vault that only exists on hardware you can unplug.",
@@ -124,7 +119,6 @@ export const RENTALS = [
     service: "The gym",
     what: "The one you drive past",
     usd: 42.0,
-    on: false,
     replacement: "Something you built",
     port: null,
     how: "Not every subscription is software. A written plan, a log you own and a bar in the garage counts here too.",

@@ -158,8 +158,10 @@ p { margin: 0; }
 }
 
 /* ── BUTTONS ──────────────────────────────────────────────────────
-   Round, glossy, and squishy: press one and it compresses rather
-   than sliding, which is the whole point of a soft interface. */
+   Round and warm, but flat. The glossy three-stop version read as a
+   plastic toy against everything else on the page, so the fill is now
+   one gentle gradient and the shadow is a soft warm halo rather than
+   a moulded rim. It still gives on press. */
 .btn {
   position: relative;
   display: inline-flex;
@@ -173,28 +175,24 @@ p { margin: 0; }
   font-size: 1.02rem;
   font-weight: 600;
   color: var(--ember-ink);
-  background: linear-gradient(180deg, var(--ember-hi) 0%, var(--ember) 52%, var(--ember-lo) 100%);
-  box-shadow:
-    0 10px 22px rgba(215, 105, 10, 0.36),
-    inset 0 2px 0 rgba(255, 255, 255, 0.75),
-    inset 0 -3px 0 rgba(150, 60, 0, 0.22);
-  transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease-out), filter 0.2s;
+  background: linear-gradient(180deg, #ffa851 0%, #ff8f2e 100%);
+  box-shadow: 0 8px 18px rgba(226, 130, 30, 0.26);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease-out), background 0.2s;
 }
 
-.btn:hover { transform: translateY(-2px) scale(1.02); filter: saturate(1.06) brightness(1.03); }
-.btn:active {
-  transform: translateY(2px) scale(0.98);
-  box-shadow: 0 4px 10px rgba(215, 105, 10, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.6);
+.btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(180deg, #ffb264 0%, #ff9a41 100%);
+  box-shadow: 0 12px 24px rgba(226, 130, 30, 0.3);
 }
+.btn:active { transform: translateY(1px); box-shadow: 0 4px 10px rgba(226, 130, 30, 0.24); }
 
 .btn-soft {
   color: var(--ink);
-  background: linear-gradient(180deg, #ffffff 0%, var(--cloud-3) 100%);
-  box-shadow:
-    0 10px 22px rgba(38, 22, 110, 0.18),
-    inset 0 2px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -3px 0 rgba(90, 70, 190, 0.1);
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(38, 22, 110, 0.14), inset 0 0 0 1px rgba(120, 108, 210, 0.18);
 }
+.btn-soft:hover { background: #fff; box-shadow: 0 12px 24px rgba(38, 22, 110, 0.18), inset 0 0 0 1px rgba(120, 108, 210, 0.3); }
 
 .btn-sm { padding: 10px 18px; font-size: 0.9rem; }
 
@@ -236,8 +234,8 @@ p { margin: 0; }
 .chip:hover { color: var(--ink); background: var(--cloud-3); transform: translateY(-1px); }
 .chip.on {
   color: #fff;
-  background: linear-gradient(180deg, #7b6dff 0%, var(--violet) 100%);
-  box-shadow: 0 6px 14px rgba(91, 75, 255, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.35);
+  background: var(--violet);
+  box-shadow: 0 6px 14px rgba(91, 75, 255, 0.28);
 }
 .chip-n { margin-left: 6px; font-family: var(--mono); font-size: 0.8em; opacity: 0.7; }
 

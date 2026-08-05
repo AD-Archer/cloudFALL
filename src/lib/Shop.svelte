@@ -272,7 +272,7 @@
     margin-top: 11px;
     padding: 5px 14px 6px;
     border-radius: var(--r-pill);
-    background: linear-gradient(180deg, #fff0e0 0%, #ffe2c6 100%);
+    background: #fff1e2;
   }
   .cost-n {
     font-family: var(--display);

@@ -12,7 +12,6 @@
 
   let wrap = $state()
   let canvas = $state()
-  let written = $state(0)
 
   // world space; everything is authored in these units and scaled to fit
   const W = 110
@@ -138,8 +137,9 @@
           stack = new Array(COLS).fill(0)
         }
       } else if (stack.every((s) => s >= 4)) {
+        // the heap is full: it settles out and starts again, so the pile is
+        // always growing back the way a monthly bill does
         flush = 1
-        written += 1
       }
     }
 
@@ -238,8 +238,8 @@
             colX(i) + jitter,
             FLOOR - h * CELL * 0.8 - CELL * 0.45,
             CELL * 0.52,
-            top ? '#ffd7a3' : '#ffb469',
-            top ? '#ff9b3d' : '#ef7a12',
+            top ? '#ffe0bd' : '#ffc998',
+            top ? '#ffab5e' : '#f79445',
             flush ? 0.2 + flush * 0.8 : 1
           )
         }
@@ -311,10 +311,7 @@
   into storage of your own underneath it."
 >
   <canvas bind:this={canvas} aria-hidden="true"></canvas>
-  <figcaption class="mono">
-    <span class="path">./media</span>
-    <span class="count">{written} volume{written === 1 ? '' : 's'} written</span>
-  </figcaption>
+  <figcaption>Subscriptions add up fast</figcaption>
 </figure>
 
 <style>
@@ -339,13 +336,12 @@
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 10px;
-    display: flex;
-    justify-content: center;
-    gap: 14px;
-    font-size: 0.64rem;
-    color: rgba(255, 255, 255, 0.7);
+    bottom: 12px;
+    text-align: center;
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.88);
+    text-shadow: 0 1px 4px rgba(30, 18, 90, 0.4);
   }
-
-  .path { color: #ffd9ae; }
 </style>
