@@ -19,12 +19,11 @@
 <main class="shell on-sky">
   <section class="wrap panel" aria-labelledby="status-title" data-analytics-section="status">
     <div class="figure" aria-hidden="true">
-      <img src="/logo.png" alt="" width="150" height="130" />
-      <span class="code">{code}</span>
+      <img src="/linky.png" alt="" width="500" height="500" />
+      <span class="code">{code} · {eyebrow}</span>
     </div>
 
     <div class="copy">
-      <p class="mono eyebrow">{eyebrow}</p>
       <h1 id="status-title">{title}</h1>
       <p class="lede">{body}</p>
       {#if detail}<p class="detail">{detail}</p>{/if}
@@ -65,32 +64,28 @@
     border-radius: 0;
   }
 
-  .figure { display: grid; justify-items: center; gap: 14px; }
-  .figure img { width: 100%; max-width: 160px; height: auto; }
+  .figure { display: grid; justify-items: center; gap: 16px; }
+  .figure img { width: 100%; max-width: 150px; height: auto; }
   .code {
-    font-family: var(--mono);
-    font-size: 1.1rem;
-    letter-spacing: 0.12em;
-    color: var(--ember-sky);
-  }
-
-  .eyebrow { color: var(--on-sky-2); }
-
-  h1 {
-    margin-top: 14px;
-    font-size: clamp(2rem, 4.4vw, 3.1rem);
+    font-family: var(--sans);
+    font-size: var(--fs-sm);
     font-weight: 700;
-    letter-spacing: -0.03em;
-    max-width: 16ch;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ember-ink);
+    text-align: center;
   }
-  .lede { margin-top: 16px; font-size: 1.06rem; color: var(--on-sky-2); max-width: 48ch; }
+
+  /* no size override: h1 already carries the documented display step */
+  h1 { max-width: 16ch; }
+  .lede { margin-top: 16px; font-size: var(--fs-xl); color: var(--on-sky-2); max-width: 48ch; }
 
   .detail {
     margin-top: 18px;
     padding: 12px 16px;
     border-radius: var(--r-sm);
-    background: rgba(0, 0, 0, 0.16);
-    font-family: var(--mono);
+    background: var(--paper-2);
+    font-family: var(--sans);
     font-size: 0.74rem;
     color: var(--on-sky-2);
     overflow-wrap: anywhere;

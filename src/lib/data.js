@@ -5,12 +5,16 @@
 import { WELCOME_URL } from "./api/stern.js";
 
 export const CONFIG = {
-  name: "CloudFALL",
+  name: "cloudFALL",
   tagline: "Destroy the cloud by making it free",
   // fallback only; the live name comes from the API's currency payload
   currency: "Coins",
   signupUrl: WELCOME_URL,
   welcomeUrl: WELCOME_URL,
+  // How to actually build the thing. This is the page's answer to "I have
+  // never run a server" and it is linked from the hero, the ledger and its
+  // own section rather than being buried in the FAQ.
+  docsUrl: "https://sterndocs.hackclub.com/cloudfall",
   slackUrl: "https://hackclub.enterprise.slack.com/archives/C0BMMC7486R",
   hackatimeUrl: "https://hackatime.hackclub.com/",
   programUrl: "https://stern.hackclub.com/a/cloudfall/home",
@@ -28,59 +32,74 @@ export const CONFIG = {
  * instead. `usd` is a rough US list price, which the section says out loud;
  * the point of the number is the size of it, not the cent.
  *
- * Nothing here is selected by default; see Ledger.svelte.
+ * The `common` three are ticked on arrival so the page states a real number
+ * before anyone touches it; the section says out loud that it is a guess.
  *
- * `port` is the port the replacement actually listens on. It is the closest
- * thing self-hosting has to a street address, and it is why a row reads as a
- * real machine you could go and build tonight.
  */
+/**
+ * The tabs the ledger groups these into. Eleven rows in one run is a wall;
+ * four short lists you can flip between is a thing you can actually read.
+ * `common` marks the handful that are ticked on arrival so the page shows
+ * a real number before you touch it — labelled as a guess, not as yours.
+ */
+export const RENTAL_GROUPS = [
+  { id: "watch", label: "Watching" },
+  { id: "listen", label: "Listening" },
+  { id: "store", label: "Photos & files" },
+  { id: "else", label: "Everything else" },
+];
+
 export const RENTALS = [
   {
     id: "video",
+    group: "watch",
+    common: true,
     brand: "netflix",
     swapBrand: "jellyfin",
     service: "Netflix",
     what: "Standard, one household",
     usd: 17.99,
     replacement: "Jellyfin",
-    port: "8096",
     how: "Rip the discs you own, stream them to every screen in the house. Nothing leaves the building.",
   },
   {
     id: "music",
+    group: "listen",
+    common: true,
     brand: "spotify",
     swapBrand: null,
     service: "Spotify",
     what: "Premium, one person",
     usd: 11.99,
     replacement: "Navidrome",
-    port: "4533",
     how: "Your library, your playlists, subsonic apps on every phone. The album stays yours when the deal expires.",
   },
   {
     id: "photos",
+    group: "store",
+    common: true,
     brand: "googlephotos",
     swapBrand: "immich",
     service: "Google Photos",
     what: "2 TB, the family plan",
     usd: 9.99,
     replacement: "Immich",
-    port: "2283",
     how: "Same auto-backup, same face search, running on a box in your room instead of a rack in Iowa.",
   },
   {
     id: "backup",
+    group: "store",
     brand: "icloud",
     swapBrand: "syncthing",
     service: "iCloud+",
     what: "2 TB, the family plan",
     usd: 9.99,
     replacement: "Syncthing",
-    port: "8384",
     how: "Every photo and backup your phone makes, landing on a drive in your house, with no account standing in the middle of it.",
   },
   {
     id: "games",
+    group: "else",
     brand: null,
     // Minecraft has no Simple Icons mark, so this one is a real image served
     // from public/ rather than an inlined path. See `img` in Ledger.svelte.
@@ -90,66 +109,66 @@ export const RENTALS = [
     what: "Realms Plus, ten players",
     usd: 7.99,
     replacement: "Paper server",
-    port: "25565",
     how: "Your world on your own box, with whatever mods you want, staying up after you stop paying anyone.",
   },
   {
     id: "notes",
+    group: "else",
     brand: "notion",
     swapBrand: "joplin",
     service: "Notion",
     what: "Plus, one person",
     usd: 12.0,
     replacement: "Joplin Server",
-    port: "22300",
     how: "Notes that sync between your laptop and your phone and stay readable as plain files if the company ever folds.",
   },
   {
     id: "files",
+    group: "store",
     brand: "dropbox",
     swapBrand: "nextcloud",
     service: "Dropbox",
     what: "Plus, 2 TB",
     usd: 11.99,
     replacement: "Nextcloud",
-    port: "443",
     how: "Files, calendar, contacts and shared links, without a company reading the folder names.",
   },
   {
     id: "video-sub",
+    group: "watch",
     brand: "youtube",
     swapBrand: null,
     service: "YouTube Premium",
     what: "One account, no ads",
     usd: 13.99,
     replacement: "TubeArchivist",
-    port: "8000",
     how: "Subscribe to channels, keep the videos, watch them again in ten years when the channel is gone.",
   },
   {
     id: "books",
+    group: "listen",
     brand: "audible",
     swapBrand: null,
     service: "Audible",
     what: "One credit a month",
     usd: 14.95,
     replacement: "Audiobookshelf",
-    port: "13378",
     how: "Your audiobooks with your progress synced, and no licence server deciding whether you may listen.",
   },
   {
     id: "passwords",
+    group: "else",
     brand: "onepassword",
     swapBrand: null,
     service: "1Password",
     what: "Individual",
     usd: 3.99,
     replacement: "Vaultwarden",
-    port: "8080",
     how: "The same browser extensions, talking to a vault that only exists on hardware you can unplug.",
   },
   {
     id: "gym",
+    group: "else",
     brand: null,
     glyph: "dumbbell",
     swapBrand: null,
@@ -157,7 +176,6 @@ export const RENTALS = [
     what: "The one you drive past",
     usd: 42.0,
     replacement: "Something you built",
-    port: null,
     how: "Not every subscription is software. A written plan, a log you own and a bar in the garage counts here too.",
   },
 ];
@@ -224,10 +242,6 @@ export const HACK_CLUB = {
     "projects. Clubs in a thousand schools, hackathons on trains and in ferry " +
     "terminals, and dozens of You Ship We Ship programs like this one, all of it run " +
     "by and for teenagers.",
-  eligibility:
-    "CloudFALL is open to anyone aged 13 to 18, anywhere on earth. Sign up in your own " +
-    "name with your own account, and the hours you log have to be hours you worked.",
-  facts: ["13 to 18", "any country", "free, always", "no application"],
 };
 
 /**

@@ -1,18 +1,17 @@
 <script>
-  import Fall from './lib/Fall.svelte'
-  import Drift from './lib/Drift.svelte'
+  import Linky from './lib/Linky.svelte'
+  import Horizon from './lib/Horizon.svelte'
   import Unit from './lib/Unit.svelte'
   import Ledger from './lib/Ledger.svelte'
-  import Terms from './lib/Terms.svelte'
   import Shop from './lib/Shop.svelte'
   import Rules from './lib/Rules.svelte'
   import Examples from './lib/Examples.svelte'
   import StatusPage from './lib/StatusPage.svelte'
   import { loadContent } from './lib/api/stern.js'
   import { initAnalytics, refreshAnalyticsSections, trackEvent } from './lib/insight.js'
-  import { CONFIG, WHO, MOVES, FINE_PRINT, RULES, HELP, HACK_CLUB } from './lib/data.js'
+  import { CONFIG, MOVES, RULES, HACK_CLUB } from './lib/data.js'
 
-  let openFaq = $state(0)
+  let openFaq = $state(-1)
   let locationState = $state(readLocation())
   let runtimeError = $state('')
 
@@ -31,7 +30,7 @@
   })
 
   // ── THE RUN ──
-  // CloudFALL has no fixed dates yet; when Stern sets them this fills in on
+  // cloudFALL has no fixed dates yet; when Stern sets them this fills in on
   // its own rather than needing a deploy.
   const DAY = 86400000
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -60,21 +59,18 @@
     }
   })
 
-  // The line ruled off under the hero: what a status page would print about
-  // this program. Live where it can be, honest where it cannot. This replaces
-  // the marquee that used to run across the top saying much the same thing.
+  // One quiet line under the hero: open or not, who can enter, how big the
+  // shop is. Live where it can be, silent where it cannot.
   let readout = $derived.by(() => {
     const bits = []
-    if (run?.ended) bits.push('closed')
-    else if (run && !run.started) bits.push(`opens ${fmtDate(run.start)}`)
-    else bits.push('open now')
+    if (run?.ended) bits.push('Closed')
+    else if (run && !run.started) bits.push(`Opens ${fmtDate(run.start)}`)
+    else bits.push('Open now')
     if (run?.started && !run.ended) {
-      bits.push(run.left === 0 ? 'closes today' : `${run.left} days left`)
+      bits.push(run.left === 0 ? 'Closes today' : `${run.left} days left`)
     }
-    bits.push('ages 13 to 18, anywhere')
-    if (typeof api.program?.hoursShipped === 'number') {
-      bits.push(`${api.program.hoursShipped} hours shipped`)
-    }
+    bits.push('Ages 13–18, anywhere')
+    bits.push('Free to enter')
     if (api.prizes.length) bits.push(`${api.prizes.length} things in the shop`)
     return bits
   })
@@ -118,7 +114,8 @@
         code: '404',
         eyebrow: 'no route to host',
         title: 'Nothing is hosted here.',
-        body: 'That path is not on this box. Everything CloudFALL serves lives on the front page.'
+        body: 'That address does not exist on this site. The front page has the shop, the rules and the sign-up.',
+        detail: ''
       }
     }
 
@@ -127,188 +124,118 @@
 
   $effect(() => {
     initAnalytics()
-  })
 
-  $effect(() => {
-    if (!api.loading) refreshAnalyticsSections()
-  })
-
-  $effect(() => {
-    loadContent()
-      .then((c) => {
-        api = { ...c, loading: false }
-        trackEvent(
-          'Content: Loaded',
-          { status: c.failures.length ? 'partial' : 'complete', failed: c.failures.join(',') },
-          { interactive: false }
-        )
-      })
-      .catch((err) => {
-        api = { ...api, loading: false, failures: [err.message] }
-        trackEvent('Content: Loaded', { status: 'failed', failed: 'all' }, { interactive: false })
-      })
-  })
-
-  $effect(() => {
-    const syncLocation = () => (locationState = readLocation())
-    const captureError = (event) => {
-      runtimeError = event.error?.message || event.message || 'Unknown runtime error'
+    const onError = (event) => {
+      runtimeError = event?.error?.message || event?.message || 'Unknown error'
     }
-    const captureRejection = (event) => {
-      runtimeError = event.reason?.message || String(event.reason || 'Unhandled promise rejection')
+    const onRejection = (event) => {
+      runtimeError = event?.reason?.message || String(event?.reason ?? 'Unhandled rejection')
+    }
+    const onPopState = () => {
+      locationState = readLocation()
     }
 
-    window.addEventListener('popstate', syncLocation)
-    window.addEventListener('hashchange', syncLocation)
-    window.addEventListener('error', captureError)
-    window.addEventListener('unhandledrejection', captureRejection)
+    window.addEventListener('error', onError)
+    window.addEventListener('unhandledrejection', onRejection)
+    window.addEventListener('popstate', onPopState)
+
+    loadContent().then((next) => {
+      api = { ...next, loading: false }
+      refreshAnalyticsSections()
+    })
 
     return () => {
-      window.removeEventListener('popstate', syncLocation)
-      window.removeEventListener('hashchange', syncLocation)
-      window.removeEventListener('error', captureError)
-      window.removeEventListener('unhandledrejection', captureRejection)
+      window.removeEventListener('error', onError)
+      window.removeEventListener('unhandledrejection', onRejection)
+      window.removeEventListener('popstate', onPopState)
     }
   })
 </script>
 
 {#if status}
-  <StatusPage {...status} />
+  <StatusPage {...status} homeUrl="/" slackUrl={CONFIG.slackUrl} />
 {:else}
-  <!-- ───────────────────────── THE SKY ─────────────────────────
-       The top of the page is the sky, flat and full bleed. The cloud comes
-       apart in it, and everything below the fold is ground you own. The page
-       is the argument's own shape, which is why there is no wallpaper behind
-       the rest of it any more. -->
-  <div class="sky sky-top on-sky">
-    <Drift />
+  <!-- The Hack Club flag, hanging off the corner of the window the way it
+       does on every other Hack Club site. Official mark, unmodified. -->
+  <a class="flag" href={CONFIG.flagUrl} target="_blank" rel="noopener" aria-label="Hack Club">
+    <img src="/branding/flag-orpheus-top.svg" alt="" width="150" height="65" />
+  </a>
 
-    <!-- Orpheus's flag hangs off the true top-left corner of the page, which
-         is where every Hack Club site puts it. The wordmark lockup that used
-         to sit beside it is gone: two marks in one corner is one too many, and
-         the program says its own name properly further down the page. -->
-    <a
-      class="flag"
-      href={CONFIG.flagUrl}
-      target="_blank"
-      rel="noopener"
-      aria-label="Hack Club"
-      data-analytics="CTA: Click"
-      data-analytics-placement="hack-club-flag"
-    >
-      <img src="/branding/flag-orpheus-top.png" alt="" width="560" height="315" />
-    </a>
-
-    <!-- The two rooms this program lives in: its own channel, and the umbrella
-         it runs under. Archer belongs above the fold rather than only in the
-         footer, because it is who is actually answering. -->
-    <header class="wrap masthead">
-      <a
-        class="btn-text"
-        href={CONFIG.slackUrl}
-        data-analytics="CTA: Click"
-        data-analytics-placement="hero-slack"
-      >
-        #ysws-cloudfall
-      </a>
-      <span class="dot" aria-hidden="true">·</span>
-      <a
-        class="btn-text"
-        href={CONFIG.archer.url}
-        target="_blank"
-        rel="noopener"
-        data-analytics="CTA: Click"
-        data-analytics-placement="hero-archer"
-      >
-        An {CONFIG.archer.name} YSWS
-      </a>
+  <!-- ═══════════════════ THE SKY ═══════════════════
+       Everything you rent lives up here. It is one band, it is the
+       wordmark's own blue, and it ends in a drawn horizon. -->
+  <div class="sky on-sky">
+    <!-- The wordmark is a banner, not a corner logo, so it runs full bleed
+         across the top of the sky rather than sitting inside the content
+         column. There is no nav: this is one page, meant to be scrolled. -->
+    <header class="banner">
+      <img src="/logo.png" alt="cloudFALL" width="1602" height="599" fetchpriority="high" />
     </header>
 
     <section class="wrap hero" id="top">
       <div class="hero-copy">
-        <p class="mono tagline">{CONFIG.tagline}</p>
+        <h1>Stop wasting money and build it yourself.</h1>
 
-        <h1>
-          Stop wasting money.
-          <em>Build it yourself.</em>
-        </h1>
-
-        <p class="lede">
-          Every month you rent films, music, photos and files on a computer you cannot
-          touch. Build the replacement, run it in your own room, ship it open-source.
+        <p class="hero-line">
+        The cloud is just someone else's computer, you're wasting money renting it. CloudFALL is a free program that will teach you how to stop renting and own your own "cloud"
         </p>
 
-        <div class="cta-row">
+        <div class="actions">
           <a
             href={CONFIG.welcomeUrl}
             class="btn"
             data-analytics="CTA: Click"
-            data-analytics-placement="hero-onboarding"
+            data-analytics-placement="hero-signup"
           >
             Sign up free
           </a>
           <a
-            href="#ledger"
+            href={CONFIG.docsUrl}
             class="btn-text"
+            target="_blank"
+            rel="noopener"
             data-analytics="CTA: Click"
-            data-analytics-placement="hero-ledger"
+            data-analytics-placement="hero-docs"
           >
-            Add up what you pay
+            Learn how it's done
           </a>
         </div>
       </div>
 
-      <div class="figure"><Fall height={390} /></div>
+    </section>
 
-      <p class="mono readout">
+    <div class="wrap">
+      <p class="readout">
         {#each readout as bit}<span>{bit}</span>{/each}
       </p>
-    </section>
+    </div>
+
+    <Horizon />
   </div>
 
+  <!-- ═══════════════════ THE GROUND ═══════════════════ -->
   <main class="wrap stack">
-    <!-- ───────────────────────── THE BILL ───────────────────────── -->
+    <!-- ── WHAT YOU PAY FOR, AND WHAT IT COMES TO ── -->
     <Unit
-      id="ledger"
-      title="What you rent"
-      sub="Every subscription in the house, floating overhead, sized by what it costs. Pop one and it lands underneath as the thing you could run instead. That is the project."
+      id="pay"
+      title="What you pay for"
+      sub="Tick the ones you pay for, we'll show you how much you can save."
     >
-      <Ledger welcomeUrl={CONFIG.welcomeUrl} />
+      <Ledger docsUrl={CONFIG.docsUrl} />
     </Unit>
 
-    <!-- ───────────────────────── WHO WE ARE ─────────────────────────
-         The name, at the size a name deserves, now that it is not sitting in
-         a corner lockup. FALL is the verb the whole program turns on, so it
-         is the half that takes the accent. -->
-    <section class="who" id="who" data-analytics-section="who">
-      <div class="who-say">
-        <img class="who-mark" src="/logo.png" alt="" width="300" height="259" />
-        <p class="mono">{WHO.eyebrow}</p>
-        <h2>We are <span class="mark">Cloud<em>FALL</em></span></h2>
-      </div>
-
-      <div class="who-copy">
-        <p class="who-line">{WHO.line}</p>
-        <p class="mono who-facts">
-          {#each WHO.facts as f}<span>{f}</span>{/each}
-        </p>
-      </div>
-    </section>
-
-    <!-- ───────────────────────── THE BUILD ─────────────────────────
-         Three moves, not five steps. The account and the time tracking are
-         real, but they are paperwork: they sit in one line underneath rather
-         than taking two of the three slots people actually read. -->
+    <!-- ── HOW IT WORKS ── -->
     <Unit
-      id="build"
+      id="how"
       title="How it works"
-      sub="Rebuild one thing you pay for every month so that you own it. Ship it open-source and the hardware to keep it running is on us."
+      sub="Three moves. Rebuild one thing you pay for monthly so that you own it, ship it open-source, and the hardware to keep it running comes from us."
     >
-      <!-- numbered because it is genuinely an order of operations -->
+      <!-- One ruled run, in the same grammar as the reviewer checks and the
+           questions below. Three equal columns of rule-plus-heading-plus-two-
+           lines is the step-card scaffold with the box taken off. -->
       <ol class="moves">
         {#each MOVES as m}
           <li class="move">
-            <span class="mono move-n">{m.n}</span>
             <h3>{m.title}</h3>
             <p>{m.body}</p>
           </li>
@@ -320,81 +247,65 @@
           class="btn"
           href={CONFIG.welcomeUrl}
           data-analytics="CTA: Click"
-          data-analytics-placement="build-onboarding"
+          data-analytics-placement="how-signup"
         >
           Sign up free
         </a>
-        <p class="mono fine">
-          {#each FINE_PRINT as f}<span>{f}</span>{/each}
+        <p class="moves-note">
+          Teens around the world. can sign up using
+           <a class="link" href={CONFIG.hackatimeUrl} target="_blank" rel="noopener">Hackatime</a>.
+          to win prizes while building.
         </p>
       </div>
     </Unit>
 
-    <!-- ──────────── THINGS TO BUILD (live, hidden when empty) ──────────── -->
+    <!-- ── THE DOCS ──
+         The honest blocker is not the code, it is not knowing that an old
+         laptop and one file is genuinely the whole setup. So the docs get a
+         section rather than a footer link. -->
+    <section class="docs" id="docs" data-analytics-section="docs">
+      <div class="docs-copy">
+        <h2>Never run a server before?</h2>
+        <p class="prose">
+          You don't have to, using our slack channel and the docs we can teach you how to turn an old device into a server, and how to selfhost. Let's get away from paying for things we don't own
+        </p>
+        <p>
+          The docs are open to everyone to learn, only teens 13-18 can compete but anyone can follow along.
+        </p>
+        <a
+          class="btn"
+          href={CONFIG.docsUrl}
+          target="_blank"
+          rel="noopener"
+          data-analytics="CTA: Click"
+          data-analytics-placement="docs-section"
+        >
+          Read the docs
+        </a>
+      </div>
+
+      <div class="docs-art">
+        <Linky pose="lean" size={150} flip />
+      </div>
+    </section>
+
+    <!-- ── THINGS PEOPLE BUILD (live, hidden when empty) ── -->
     {#if api.examples.length}
       <Unit
         id="ideas"
         title="Things to build"
-        sub="Starting points, not a menu. Take one and twist it into the stack you actually want."
+        sub="These are things that already exist, hosting them don't count. Try to find a way to take this and make it your own, rather its a client, a plugin, or something brand new."
       >
         <Examples items={api.examples} />
       </Unit>
     {/if}
 
-    <!-- ───────────────────────── TERMS ───────────────────────── -->
-    <Unit id="terms" title="New here?" sub="The whole deal in four lines. Read it before the shop.">
-      <Terms
-        slackUrl={CONFIG.slackUrl}
-        hackatimeUrl={CONFIG.hackatimeUrl}
-        welcomeUrl={CONFIG.welcomeUrl}
-      />
-    </Unit>
-
-    <!-- ───────────────────────── HACK CLUB ─────────────────────────
-         Most people arriving from a link have never heard of Hack Club, and
-         the age rule is the one bit of eligibility that stops somebody
-         halfway through. Both belong on the page, not in the FAQ. -->
-    <section class="panel hc" id="hackclub" data-analytics-section="hackclub">
-      <div class="hc-art">
-        <img src="/branding/flag-standalone.svg" alt="Hack Club" width="220" height="127" />
-      </div>
-
-      <div class="hc-copy">
-        <h2>{HACK_CLUB.headline}</h2>
-        <p>{HACK_CLUB.body}</p>
-        <p class="hc-elig">{HACK_CLUB.eligibility}</p>
-        <p class="mono hc-facts">
-          {#each HACK_CLUB.facts as f}<span>{f}</span>{/each}
-        </p>
-        <div class="cta-row">
-          <a
-            class="btn btn-soft btn-sm"
-            href={CONFIG.flagUrl}
-            target="_blank"
-            rel="noopener"
-            data-analytics="CTA: Click"
-            data-analytics-placement="hackclub-site"
-          >
-            What is Hack Club?
-          </a>
-          <a
-            class="btn-text"
-            href="https://stern.hackclub.com/rudder/"
-            data-analytics="CTA: Click"
-            data-analytics-placement="hackclub-ysws"
-          >
-            Other YSWS
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ───────────────────────── SHOP (live) ───────────────────────── -->
+    <!-- ── THE SHOP (live) ── -->
     <Unit
       id="shop"
       title="The shop"
-      sub="Priced in tracked hours, cheapest first. Somewhere to put the library once it is yours."
-      cta="Full shop"
+      sub="Priced in the hours you logged, cheapest first. Somewhere to put the library once it is yours."
+      cta="See the full shop"
       href={CONFIG.programUrl}
     >
       <Shop
@@ -405,7 +316,7 @@
       />
     </Unit>
 
-    <!-- ───────────────────────── CHECKS ───────────────────────── -->
+    <!-- ── WHAT REVIEWERS CHECK ── -->
     <Unit id="checks" title={RULES.title} sub={RULES.intro}>
       <Rules
         items={RULES.items}
@@ -414,14 +325,14 @@
       />
     </Unit>
 
-    <!-- ─────────────── NEWS / EVENTS (live, hidden when empty) ─────────────── -->
+    <!-- ── NEWS / EVENTS (live, hidden when empty) ── -->
     {#if api.news.length}
       <Unit id="news" title="Latest news" sub="Announcements from the people running the program.">
         <div class="feed">
           {#each api.news as item}
             <article class="entry">
               {#if item.publishedAt}
-                <p class="mono">{new Date(item.publishedAt).toLocaleDateString()}</p>
+                <p class="entry-when">{new Date(item.publishedAt).toLocaleDateString()}</p>
               {/if}
               <div>
                 {#if item.title}<h3>{item.title}</h3>{/if}
@@ -438,7 +349,7 @@
         <div class="feed">
           {#each api.events as ev}
             <article class="entry">
-              {#if ev.startsAt}<p class="mono">{new Date(ev.startsAt).toLocaleString()}</p>{/if}
+              {#if ev.startsAt}<p class="entry-when">{new Date(ev.startsAt).toLocaleString()}</p>{/if}
               <div>
                 {#if ev.title}<h3>{ev.title}</h3>{/if}
                 {#if ev.description}<p class="entry-body">{ev.description}</p>{/if}
@@ -449,17 +360,17 @@
       </Unit>
     {/if}
 
-    <!-- ───────────────────────── FAQ (live) ───────────────────────── -->
+    <!-- ── QUESTIONS (live) ── -->
     <Unit id="faq" title="Questions" sub="Anything missing, ask in the Slack.">
       {#if api.loading}
-        <p class="msg mono">reading the faq</p>
+        <p class="msg">Reading the questions…</p>
       {:else if api.faq.length}
         <div class="faq">
           {#each api.faq as item, i}
             <div class="qa" class:open={openFaq === i}>
               <button class="qa-q" onclick={() => toggleFaq(i)} aria-expanded={openFaq === i}>
                 <span class="qa-text">{item.question}</span>
-                <span class="qa-sign" aria-hidden="true">{openFaq === i ? '–' : '+'}</span>
+                <span class="qa-sign" aria-hidden="true"></span>
               </button>
               {#if openFaq === i}
                 <p class="qa-a">{item.answer}</p>
@@ -469,59 +380,59 @@
         </div>
       {:else}
         <p class="msg">
-          Questions could not be loaded. Ask in <a href={CONFIG.slackUrl}>the Slack</a> and
-          someone will answer.
+          The questions could not be loaded. Ask in
+          <a class="link" href={CONFIG.slackUrl}>the Slack</a> and someone will answer.
         </p>
       {/if}
     </Unit>
 
-    <!-- ───────────────── NEVER SELF-HOSTED ANYTHING ───────────────── -->
-    <Unit
-      id="help"
-      title="Never hosted anything?"
-      sub="Then this program is aimed squarely at you. Nobody is expected to arrive knowing this, and there are people in the Slack who will get your first one running with you."
-    >
-      <ul class="helps">
-        {#each HELP as h}
-          <li class="help">
-            <span class="pill">{h.tag}</span>
-            <h3>{h.title}</h3>
-            <p>{h.body}</p>
-          </li>
-        {/each}
-      </ul>
-      <p class="help-tail">
-        Stuck at any point, from picking a service to opening a terminal, ask in
+    <!-- ── WHO RUNS THIS ──
+         Most people arriving from a link have never heard of Hack Club. -->
+    <section class="hc" id="hackclub" data-analytics-section="hackclub">
+      <!-- not lazy: it is the one image on the page whose absence would read
+           as a missing credit rather than a slow load -->
+      <img
+        class="hc-flag"
+        src="/branding/flag-standalone.svg"
+        alt="Hack Club"
+        width="526"
+        height="184"
+      />
+      <div class="hc-copy">
+        <h2>{HACK_CLUB.headline}</h2>
+        <p class="prose">{HACK_CLUB.body}</p>
+        <p class="prose">{HACK_CLUB.eligibility}</p>
         <a
-          href={CONFIG.slackUrl}
+          class="btn-text"
+          href={CONFIG.flagUrl}
+          target="_blank"
+          rel="noopener"
           data-analytics="CTA: Click"
-          data-analytics-placement="help-slack">#ysws-cloudfall</a
-        >. Bring the error message, however small it looks.
-      </p>
-    </Unit>
+          data-analytics-placement="hackclub-site"
+        >
+          What is Hack Club?
+        </a>
+      </div>
+    </section>
   </main>
 
-  <!-- ───────────────────────── BACK TO THE SKY ─────────────────────────
-       The page opened in the sky and closes in it. Same flat violet, the ask,
-       and nothing else on it. -->
-  <section class="sky sky-bottom closer on-sky" id="signup">
-    <Drift />
+  <!-- ═══════════════════ BACK TO THE SKY ═══════════════════ -->
+  <section class="sky sky-foot on-sky" id="signup">
+    <Horizon flip />
 
-    <div class="wrap closer-in">
-      <img class="closer-mark" src="/logo.png" alt="" width="150" height="130" />
-      <div>
-        <h2>Then it is just a thing you own.</h2>
-        <p class="closer-sub">
-          No essay, no interview, no fee, and no monthly anything. Pick the subscription you
-          would miss least, build the replacement, log the hours, and the discs to keep the
-          library on come from us.
+    <div class="wrap closer">
+      <div class="closer-copy">
+        <h2>Let's start building.</h2>
+        <p class="closer-line">
+          Pick the subscription,
+          build the replacement, log the hours.
         </p>
-        <div class="cta-row">
+        <div class="actions">
           <a
             href={CONFIG.welcomeUrl}
             class="btn"
             data-analytics="CTA: Click"
-            data-analytics-placement="footer-onboarding"
+            data-analytics-placement="closer-signup"
           >
             Sign up free
           </a>
@@ -529,411 +440,355 @@
             href={CONFIG.slackUrl}
             class="btn-text"
             data-analytics="CTA: Click"
-            data-analytics-placement="footer-slack"
+            data-analytics-placement="closer-slack"
           >
             Or say hello in #ysws-cloudfall
           </a>
         </div>
       </div>
-    </div>
-  </section>
 
-  <footer class="wrap footer">
-    <div class="footer-top">
-      <div class="brand">
-        <img src="/logo.png" alt="" width="30" height="26" />
-        <span class="wordmark">CloudFALL</span>
+      <div class="closer-art">
+        <Linky pose="peek" size={124} />
       </div>
+    </div>
+
+    <footer class="wrap">
+      <div class="footer">
       <nav class="footer-links">
-        <a href={CONFIG.welcomeUrl} data-analytics="CTA: Click" data-analytics-placement="footer-onboarding">Sign up</a>
+        <a href={CONFIG.welcomeUrl} data-analytics="CTA: Click" data-analytics-placement="footer-signup">Sign up</a>
+        <a href={CONFIG.docsUrl} target="_blank" rel="noopener" data-analytics="CTA: Click" data-analytics-placement="footer-docs">Docs</a>
         <a href={CONFIG.programUrl} data-analytics="CTA: Click" data-analytics-placement="footer-program">Program</a>
         <a href={CONFIG.slackUrl} data-analytics="CTA: Click" data-analytics-placement="footer-slack">Slack</a>
         <a href={CONFIG.hackatimeUrl} data-analytics="CTA: Click" data-analytics-placement="footer-hackatime">Hackatime</a>
         <a href="https://ysws.hackclub.com/" data-analytics="CTA: Click" data-analytics-placement="footer-ysws">All YSWS</a>
-        <a href={CONFIG.flagUrl} data-analytics="CTA: Click" data-analytics-placement="footer-hack-club">Hack Club</a>
       </nav>
-    </div>
-    <p class="mono disclaimer">
-      A Hack Club YSWS, part of the
-      <a href={CONFIG.archer.url} target="_blank" rel="noopener">{CONFIG.archer.name}</a>
-      program · made by teenagers, for teenagers · content served live from
-      <a href={CONFIG.programUrl}>Stern</a>
-    </p>
-  </footer>
+      <p class="disclaimer">
+        A Hack Club YSWS, part of the
+        <a href={CONFIG.archer.url} target="_blank" rel="noopener">{CONFIG.archer.name}</a>
+        program. Made by teenagers, for teenagers. Content served live from
+        <a href={CONFIG.programUrl}>Stern</a>.
+      </p>
+      </div>
+    </footer>
+  </section>
 {/if}
 
 <style>
-  /* ── THE SKY ──
-     Two bands of it, one at each end of the page, and the ground in between.
-     A sky is allowed to be deeper at the top; that is weather, not chrome. */
-  .sky {
-    position: relative;
-    background: linear-gradient(180deg, #4835ea 0%, var(--sky) 46%);
-    color: var(--on-sky);
-  }
-  /* above the drifting canvas, which is absolute inside the band */
-  .masthead,
-  .hero,
-  .closer-in { position: relative; z-index: 1; }
-
-  /* Where the sky ends, the ground comes up through it as cloud: fifteen
-     overlapping circles of fourteen different radii over a 460px tile, so it
-     reads as weather rather than as a row of scallops and the repeat is long
-     enough that nobody counts it. It is the name of the program drawn at each
-     seam, and the only place on the page that spends anything on an edge. */
-  .sky-top::after,
-  .sky-bottom::before,
-  .sky-bottom::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 52px;
-    /* above the drifting canvas: ::before would otherwise paint under it */
-    z-index: 2;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='52' viewBox='0 0 460 52' fill='%23efeef9'%3E%3Crect y='34' width='460' height='18'/%3E%3Ccircle cx='0' cy='34' r='18'/%3E%3Ccircle cx='32' cy='34' r='24'/%3E%3Ccircle cx='68' cy='34' r='15'/%3E%3Ccircle cx='98' cy='34' r='26'/%3E%3Ccircle cx='138' cy='34' r='17'/%3E%3Ccircle cx='170' cy='34' r='22'/%3E%3Ccircle cx='204' cy='34' r='15'/%3E%3Ccircle cx='234' cy='34' r='25'/%3E%3Ccircle cx='276' cy='34' r='18'/%3E%3Ccircle cx='310' cy='34' r='23'/%3E%3Ccircle cx='346' cy='34' r='16'/%3E%3Ccircle cx='376' cy='34' r='24'/%3E%3Ccircle cx='416' cy='34' r='17'/%3E%3Ccircle cx='450' cy='34' r='20'/%3E%3Ccircle cx='460' cy='34' r='18'/%3E%3C/svg%3E");
-    background-repeat: repeat-x;
-    background-size: 460px 52px;
-    pointer-events: none;
-  }
-  .sky-top::after,
-  .sky-bottom::after { bottom: -1px; }
-  /* the same edge, turned over: the ground dips back into the sky */
-  .sky-bottom::before { top: -1px; transform: rotate(180deg); }
-
-  /* ── THE FLAG ──
-     Fixed, not absolute: it hangs off the corner of the window and stays
-     there the whole way down the page, the way it does on every other Hack
-     Club site. It is the only thing on the page that does not scroll. */
+  /* ═══════════ THE FLAG ═══════════
+     Fixed to the corner of the window, unmodified, the way it sits on
+     every Hack Club site. */
   .flag {
     position: fixed;
     top: 0;
-    left: clamp(6px, 1.6vw, 24px);
+    left: clamp(14px, 3.5vw, 44px);
     z-index: 60;
-    line-height: 0;
+    width: clamp(104px, 12vw, 168px);
+    filter: drop-shadow(0 5px 12px rgba(20, 30, 44, 0.2));
   }
-  .flag img { width: clamp(132px, 16vw, 232px); height: auto; }
-  /* it travels over violet, pale ground and white panels, so the ring has to
-     survive all three: ink against ember reads on any of them */
-  .flag:focus-visible {
-    outline: 2px solid var(--ink);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 5px var(--ember);
+  .flag img { width: 100%; height: auto; }
+
+  /* ═══════════ THE SKY ═══════════ */
+  .sky { padding-top: clamp(44px, 4.4vw, 60px); }
+
+  .sky-foot {
+    padding-top: 0;
+    margin-top: var(--gap);
   }
 
-  /* Held to the right, where the flag can never reach it. */
-  .masthead {
-    display: flex;
-    align-items: baseline;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 2px 12px;
-    padding-block: 18px;
-    color: var(--on-sky-2);
-  }
-  .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; }
-  .brand img { width: 34px; height: auto; }
-  .wordmark {
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 1.2rem;
-    letter-spacing: -0.02em;
-  }
+  /* ── the banner ──
+     The wordmark ships at its own colours and is never recoloured: the
+     creature standing in for the o and the Hack Club ribbon behind it are
+     both full-colour art, and knocking the mark out to a single tone
+     deletes them. The sky is pale so that it does not have to be.
 
-  /* ── HERO ── */
-  .hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
-    align-items: center;
-    gap: clamp(20px, 4vw, 52px);
-    /* the flag hangs into this band, and it grows with the viewport faster
-       than the masthead does, so the first line of copy has to start below
-       where the banner tip lands */
-    padding-top: clamp(30px, 6vw, 88px);
-    /* room for the cloud edge to sit under the readout without touching it */
-    padding-bottom: clamp(46px, 6vw, 66px);
-  }
-
-  .tagline { color: var(--on-sky-2); }
-
-  h1 {
-    margin-top: 16px;
-    font-size: clamp(2.5rem, 5.6vw, 4.4rem);
-    font-weight: 700;
-    line-height: 1.02;
-    letter-spacing: -0.035em;
-    max-width: 15ch;
-  }
-  h1 em {
+     Full bleed: it is not inside the content column, it spans the whole
+     band. The art carries transparent margin on every side — 12% of its
+     height above and 14.7% below — so the negative block margins trim
+     exactly that much back off. Without them the band is 540px of mostly
+     empty sky at desktop width and the horizon never reaches the fold.
+     Percentages resolve against the band's width, which is why they read
+     as 4.4/5.4 rather than 12/14.7. */
+  .banner {
     display: block;
-    font-style: normal;
-    color: var(--ember-sky);
+    width: 100%;
+  }
+  .banner img {
+    width: 100%;
+    height: auto;
+    margin-block: -4.4% -5.4%;
   }
 
-  .lede {
-    max-width: 50ch;
-    margin-top: 20px;
-    font-size: 1.06rem;
+  /* ── hero ── */
+  /* One column and no mascot: the banner above already carries him, as the
+     o of cloud. Two instances of one drawing at one scale in one viewport
+     reads as a template repeat and spends the wordmark's joke twice. His
+     first standalone appearance is the docs section, where it lands. */
+  .hero {
+    padding-top: clamp(14px, 1.8vw, 22px);
+    padding-bottom: clamp(20px, 2.6vw, 30px);
+  }
+
+  h1 { letter-spacing: -0.02em; }
+
+  .hero-line {
+    margin-top: 16px;
+    font-size: clamp(1.06rem, 1.5vw, 1.19rem);
+    line-height: 1.58;
     color: var(--on-sky-2);
+    max-width: 52ch;
   }
 
-  .cta-row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; margin-top: 28px; }
+  .hero .actions { margin-top: 24px; }
 
-  .figure { min-width: 0; }
 
-  /* the live line: what a status readout would print if this program were a
-     service, which is the joke the whole page runs on */
+  /* ── the quiet line under the hero ── */
   .readout {
-    grid-column: 1 / -1;
     display: flex;
     flex-wrap: wrap;
-    gap: 6px 28px;
-    margin-top: clamp(14px, 2.5vw, 26px);
-    padding-top: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.28);
-    color: var(--on-sky-2);
+    gap: 8px clamp(14px, 2.4vw, 26px);
+    font-family: var(--sans);
+    font-size: var(--fs-sm);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--on-sky-3);
+    padding-bottom: clamp(16px, 2.2vw, 24px);
+    border-top: 1px solid var(--rule-sky);
+    padding-top: 13px;
   }
 
-  /* ── PAGE STACK ── */
+  /* ═══════════ THE GROUND ═══════════ */
   .stack {
     display: grid;
-    /* minmax(0,1fr), not the implicit auto column, or the widest child sizes
-       the whole stack and overflows small screens */
-    grid-template-columns: minmax(0, 1fr);
     gap: var(--gap);
-    padding-top: var(--gap);
-    padding-bottom: var(--gap);
+    padding-top: clamp(46px, 7vw, 88px);
   }
 
-  /* ── WHO WE ARE ──
-     No panel under this one. After a page of white surfaces the name gets
-     said straight onto the ground, at full size, and then the page carries on. */
-  .who {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    /* centred, not top-aligned: the statement belongs beside the wordmark,
-       not floating above it while the name sits at the foot of its column */
-    align-items: center;
-    gap: clamp(22px, 4vw, 60px);
-    padding-inline: clamp(4px, 2vw, 40px);
-  }
-
-  .who-mark { width: clamp(112px, 13vw, 172px); height: auto; margin-bottom: 14px; }
-
-  .who h2 {
-    margin-top: 10px;
-    font-size: clamp(2.4rem, 6vw, 4.4rem);
-    font-weight: 700;
-    line-height: 0.98;
-    letter-spacing: -0.035em;
-  }
-  /* Cloud is theirs and stays in ink; FALL is the part you do */
-  .mark { white-space: nowrap; }
-  .mark em { font-style: normal; color: var(--ember-ink); }
-
-  /* one short statement, so it is set at the size of a statement rather than
-     at the size of body copy */
-  .who-copy { display: grid; justify-items: start; gap: 22px; }
-  /* its own class, not `.who-copy > p`: the facts line underneath is a
-     paragraph too, and a child selector would blow it up to statement size */
-  .who-line {
-    font-size: clamp(1.18rem, 2vw, 1.55rem);
-    line-height: 1.42;
-    color: var(--ink);
-    max-width: 38ch;
-  }
-  .who-facts { display: flex; flex-wrap: wrap; gap: 6px 24px; }
-
-  /* ── MOVES ── */
+  /* ── how it works ── */
   .moves {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(20px, 3vw, 40px);
+    border-top: 1px solid var(--rule);
   }
-  .move { padding-top: 14px; border-top: 2px solid var(--ember); }
-  .move-n { display: block; color: var(--ember-ink); }
-  .move h3 { margin-top: 10px; font-size: 1.5rem; }
-  .move p { margin-top: 8px; color: var(--ink-2); }
+
+  .move {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: clamp(14px, 3vw, 34px);
+    align-items: baseline;
+    padding-block: 20px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .move p {
+    font-size: var(--fs-lg);
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 60ch;
+  }
 
   .moves-foot {
     display: flex;
-    align-items: center;
-    gap: 18px 30px;
     flex-wrap: wrap;
-    margin-top: clamp(26px, 3.5vw, 40px);
-  }
-  .fine { display: flex; flex-wrap: wrap; gap: 6px 26px; flex: 1 1 22ch; color: var(--ink-2); }
-
-  /* ── HACK CLUB ── */
-  .hc {
-    display: grid;
-    grid-template-columns: 220px minmax(0, 1fr);
     align-items: center;
-    gap: clamp(22px, 4vw, 50px);
-    padding: clamp(26px, 3.6vw, 44px) clamp(22px, 3vw, 40px);
+    gap: clamp(16px, 3vw, 32px);
+    margin-top: clamp(28px, 4vw, 40px);
   }
-  .hc-art { display: grid; place-items: center; }
-  .hc-art img { width: 100%; max-width: 210px; }
-
-  .hc-copy { display: grid; justify-items: start; gap: 16px; max-width: 66ch; }
-  .hc h2 { font-size: clamp(1.6rem, 3.2vw, 2.3rem); }
-  .hc-copy > p { color: var(--ink-2); }
-  /* the age rule is the one thing here that changes whether somebody can take
-     part, so it is the one thing marked */
-  .hc-elig {
-    padding-left: 16px;
-    border-left: 3px solid #ec3750;
-    color: var(--ink);
+  .moves-note {
+    font-size: var(--fs-md);
+    line-height: 1.55;
+    color: var(--ink-3);
+    max-width: 46ch;
   }
-  .hc-facts { display: flex; flex-wrap: wrap; gap: 6px 24px; }
-  .hc .cta-row { margin-top: 4px; }
 
-  /* ── HELP ── */
-  .helps {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  /* ── the docs ──
+     The one section on the paper that takes a tint, because it is the
+     answer to the question that stops most people. */
+  /* No box. It is told apart from what surrounds it by the heavy rule and
+     by the space above it, the same way every other section on this page
+     is told apart. */
+  .docs {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(20px, 3vw, 40px);
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: clamp(20px, 4vw, 48px);
+    padding-top: clamp(26px, 3.5vw, 38px);
+    border-top: 2px solid var(--ink);
   }
-  .help { padding-top: 14px; border-top: 1px solid var(--rule-2); }
-  .help h3 { margin-top: 10px; font-size: 1.2rem; }
-  .help p { margin-top: 8px; color: var(--ink-2); font-size: 1rem; }
-  .help-tail {
-    margin-top: clamp(24px, 3.5vw, 38px);
-    color: var(--ink-2);
-    max-width: 72ch;
-  }
-  .help-tail a { color: var(--ink); text-underline-offset: 3px; }
 
-  /* ── NEWS / EVENTS ── */
-  .feed { display: grid; }
+  .docs-copy { display: grid; justify-items: start; gap: 16px; }
+  .docs-copy .btn { margin-top: 4px; }
+
+  .docs-url {
+    font-family: var(--sans);
+    font-size: var(--fs-md);
+    letter-spacing: 0.02em;
+    color: var(--ink-3);
+  }
+
+  .docs-art { justify-self: end; }
+
+  /* ── news / events ── */
+  .feed { display: grid; gap: 0; }
+
   .entry {
     display: grid;
     grid-template-columns: 150px minmax(0, 1fr);
-    gap: 24px;
-    padding: 18px 0;
+    gap: clamp(14px, 3vw, 34px);
+    padding-block: 22px;
     border-top: 1px solid var(--rule);
   }
   .entry:last-child { border-bottom: 1px solid var(--rule); }
-  .entry h3 { font-size: 1.2rem; }
-  .entry .mono { padding-top: 5px; }
-  .entry-body { margin-top: 8px; color: var(--ink-2); max-width: 70ch; }
 
-  /* ── FAQ ── */
-  .faq { display: grid; }
-  .qa { border-top: 1px solid var(--rule); }
-  .qa:last-child { border-bottom: 1px solid var(--rule); }
+  .entry-when {
+    font-family: var(--sans);
+    font-size: var(--fs-sm);
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+    padding-top: 3px;
+  }
+  .entry-body {
+    margin-top: 6px;
+    font-size: var(--fs-lg);
+    line-height: 1.6;
+    color: var(--ink-2);
+    max-width: 62ch;
+  }
+
+  /* ── questions ── */
+  .faq { border-top: 1px solid var(--rule); }
+
+  .qa { border-bottom: 1px solid var(--rule); }
+
   .qa-q {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 20px;
-    align-items: baseline;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 20px;
     width: 100%;
-    padding: 16px 0;
-    border: none;
     background: none;
+    border: none;
+    padding: 19px 2px;
     text-align: left;
-    color: var(--ink);
+    color: inherit;
+    font-family: var(--serif);
+    font-size: var(--fs-xl);
+    font-weight: 600;
+    line-height: 1.4;
+    transition: color 150ms ease;
   }
-  .qa-text {
-    font-family: var(--display);
-    font-weight: 500;
-    font-size: 1.12rem;
-    line-height: 1.35;
-  }
-  .qa-q:hover .qa-text { color: var(--ember-ink); }
+  .qa-q:hover { color: var(--ember-ink); }
+
+  /* a drawn plus/minus, not a unicode glyph */
   .qa-sign {
-    justify-self: end;
-    font-family: var(--mono);
-    font-size: 1.1rem;
-    color: var(--ink-3);
+    position: relative;
+    flex: none;
+    width: 15px;
+    height: 15px;
   }
-  .qa-a { padding: 0 0 20px; color: var(--ink-2); max-width: 78ch; }
+  .qa-sign::before,
+  .qa-sign::after {
+    content: '';
+    position: absolute;
+    inset: 50% 0 auto 0;
+    height: 2px;
+    background: var(--ink-3);
+    transform: translateY(-50%);
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease;
+  }
+  .qa-sign::after { transform: translateY(-50%) rotate(90deg); }
+  .qa.open .qa-sign::after { transform: translateY(-50%) rotate(0deg); opacity: 0; }
 
-  .msg { color: var(--ink-2); }
-  .msg a { color: var(--ink); }
+  .qa-a {
+    padding: 0 2px 22px;
+    font-size: var(--fs-lg);
+    line-height: 1.62;
+    color: var(--ink-2);
+    max-width: 68ch;
+  }
 
-  /* ── CLOSER ── */
-  .closer-in {
+  .msg { color: var(--ink-3); }
+
+  /* ── who runs this ── */
+  /* one column, starting on the same margin as every other section */
+  .hc {
     display: grid;
+    justify-items: start;
+    gap: clamp(18px, 2.6vw, 26px);
+    padding-top: clamp(28px, 4vw, 40px);
+    border-top: 1px solid var(--rule);
+  }
+  .hc-flag { width: clamp(170px, 22vw, 250px); height: auto; }
+  .hc-copy { display: grid; justify-items: start; gap: 14px; }
+
+  /* ═══════════ THE CLOSER ═══════════ */
+  .closer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    grid-template-columns: 180px minmax(0, 1fr);
-    gap: clamp(22px, 4vw, 52px);
-    /* the cloud edges eat into both ends of this band, so it is padded past
-       them rather than tucked under them */
-    padding-top: clamp(74px, 9vw, 118px);
-    padding-bottom: clamp(74px, 9vw, 112px);
-  }
-  .closer-mark { width: 100%; max-width: 170px; height: auto; }
-  .closer h2 {
-    font-size: clamp(1.9rem, 4.4vw, 3.1rem);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    max-width: 15ch;
-  }
-  .closer-sub {
-    max-width: 54ch;
-    margin-top: 16px;
-    font-size: 1.06rem;
-    color: var(--on-sky-2);
+    gap: clamp(22px, 4vw, 50px);
+    padding-top: clamp(34px, 5vw, 62px);
+    padding-bottom: clamp(34px, 5vw, 58px);
   }
 
-  /* ── FOOTER ── */
-  .footer { padding-block: clamp(26px, 3.5vw, 40px); }
-  .footer-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 18px 30px;
-    flex-wrap: wrap;
+  .closer-line {
+    margin-top: 16px;
+    font-size: var(--fs-xl);
+    line-height: 1.58;
+    color: var(--on-sky-2);
+    max-width: 50ch;
   }
+  .closer .actions { margin-top: 26px; }
+  .closer-art { justify-self: end; }
+
+  /* ── footer ── */
+  .footer {
+    display: grid;
+    gap: 16px;
+    padding-top: 26px;
+    padding-bottom: clamp(34px, 5vw, 52px);
+    border-top: 1px solid var(--rule-sky);
+  }
+
   .footer-links {
     display: flex;
-    gap: 8px 22px;
     flex-wrap: wrap;
-    font-family: var(--display);
-    font-size: 0.94rem;
+    gap: 10px clamp(16px, 2.6vw, 30px);
+    font-family: var(--sans);
+    font-size: var(--fs-md);
+    font-weight: 500;
   }
-  .footer-links a { color: var(--ink-2); text-decoration: none; }
-  .footer-links a:hover { color: var(--ember-ink); }
-  .disclaimer {
-    margin-top: 26px;
-    padding-top: 18px;
-    border-top: 1px solid var(--rule);
-    font-size: 0.62rem;
-    line-height: 1.9;
+  .footer-links a {
+    text-decoration: none;
+    color: var(--on-sky-2);
+    border-bottom: 1.5px solid transparent;
+    transition: color 150ms ease, border-color 150ms ease;
   }
-  .disclaimer a { color: var(--ink-2); }
+  .footer-links a:hover { color: var(--on-sky); border-bottom-color: var(--on-sky-3); }
 
-  /* ── RESPONSIVE ── */
-  @media (max-width: 900px) {
-    .hero { grid-template-columns: minmax(0, 1fr); }
-    /* the cloud leads on narrow screens: it explains the name before a word
-       has been read. Its caption goes, though: stacked directly above the
-       tagline it made two lines of small mono type in a row. */
-    .figure { grid-row: 1; }
-    .figure :global(figcaption) { display: none; }
-    .moves { grid-template-columns: minmax(0, 1fr); gap: 24px; }
-    .helps { grid-template-columns: minmax(0, 1fr); gap: 24px; }
-    .hc { grid-template-columns: minmax(0, 1fr); }
-    .hc-art img { max-width: 170px; }
-    .closer-in { grid-template-columns: minmax(0, 1fr); justify-items: start; }
-    .who { grid-template-columns: minmax(0, 1fr); }
-    h1 { max-width: none; }
+  .disclaimer {
+    font-family: var(--sans);
+    font-size: var(--fs-md);
+    line-height: 1.6;
+    color: var(--on-sky-3);
+    max-width: 68ch;
   }
-  @media (max-width: 440px) {
-    /* below this the pair still fits on one line, but only by starting under
-       the flag. Stacked and right-aligned, both clear it, and the separator
-       has nothing left to separate. */
-    .masthead { flex-direction: column; align-items: flex-end; gap: 2px; }
-    .dot { display: none; }
-  }
-  @media (max-width: 640px) {
+  .disclaimer a { color: var(--on-sky-2); text-underline-offset: 3px; }
+
+  /* ═══════════ NARROW ═══════════ */
+  @media (max-width: 860px) {
+    /* everywhere else he stays beside the copy rather than dropping below
+       it, which is what made him read as loose on a narrow screen */
+    .docs,
+    .closer {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: clamp(14px, 3vw, 28px);
+    }
+    .docs-art :global(.linky),
+    .closer-art :global(.linky) { width: min(96px, 24vw); }
+
+    .move { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+
     .entry { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   }
 </style>

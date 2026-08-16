@@ -1,58 +1,95 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fredoka:wght@500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..800;1,400..700&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap');
 
 /* ══════════════════════════════════════════════════════════════════
-   CLOUDFALL house system: flat sky.
+   cloudFALL house system: sky over paper.
 
-   The identity is unchanged: violet sky, a spiked cloud coming apart,
-   everything a little round. What is gone is the finish on it. No
-   gradients, no glows, no lift shadows, no hover animation. A colour
-   is one colour. A surface is one surface.
+   The identity is the hand-lettered wordmark and the creature in it.
+   Everything here is built to sit under those two drawings without
+   arguing with them: the blue is lifted straight off the lettering,
+   the peach off the creature, and the ground is paper.
 
-   The page is the argument's own shape: it starts as sky, the cloud
-   falls out of it, and everything below the fold is ground you own.
+   The page is the name: a band of sky at the top, a drawn horizon,
+   and paper the whole way down. Sky is where the things you rent
+   live. Paper is the part you own.
 
-     violet   the sky, and only the sky
-     ember    the cloud's spikes, the price of a thing, the action
+   Calm is the brief. That means space instead of edges, one accent
+   instead of four, and no chrome that has to be explained.
+
+     sky      the band at each end, and nothing else
+     ember    money, and marks that need to be found
      ink      everything you read
    ══════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* sky */
-  --sky: #5341f0;
+  /* ── sky ──
+     A pale sky, not a saturated one. The wordmark is full-colour art —
+     blue lettering, a pink creature standing in for the o, a red Hack
+     Club ribbon — and it was drawn for a light ground. Knocking it out
+     to white to survive a deep blue band erases the creature, which is
+     the identity. So the sky is light enough to carry the drawings at
+     their real colours, and the deep blue moves to the actions. */
+  --sky: #cee1ed;
+  --sky-deep: #3f6d92;
+  /* the pressed state of the one filled action; 6.61:1 against its label */
+  --sky-deeper: #355c7d;
+  /* a white wash, for hover on the sky band where a paper tint would muddy */
+  --wash: rgba(255, 255, 255, 0.44);
+  /* ink on the sky is still ink; the band is a tint, not an inversion */
+  --on-sky: #223549;
+  --on-sky-2: #47607a;
+  --on-sky-3: #4a5f74;
+  --rule-sky: rgba(34, 53, 73, 0.16);
 
-  /* ground */
-  --paper: #efeef9;
-  --panel: #ffffff;
-  --rule: #dedcf0;
-  --rule-2: #c9c5e6;
+  /* ── ground ── warm paper, because the drawings sit on paper */
+  --paper: #fbf7f1;
+  --paper-2: #f4ece0;
+  --rule: #e6dccd;
+  --rule-2: #d3c5b1;
 
-  /* ink, on ground */
-  --ink: #1a1633;
-  --ink-2: #5a5580;
-  --ink-3: #6f6b96;
+  /* ── ink ── a blue-grey, not a black; it belongs to the same family */
+  --ink: #26374a;
+  --ink-2: #596d81;
+  /* #8496a6 read 2.85:1 on paper — a caption grey that fails at body size.
+     These tints are computed against both grounds, not eyeballed. */
+  --ink-3: #5b6c80;
 
-  /* ink, on sky */
-  --on-sky: #ffffff;
-  --on-sky-2: rgba(255, 255, 255, 0.72);
+  /* ── the creature ── the peach and the orange off his spikes.
+     Only the two the build actually uses are declared: a token nothing
+     renders is not a system, it is a note. The full sampled range off the
+     artwork lives in PRODUCT.md. */
+  --peach: #f0b4a8;
+  --ember: #fc9c6c;
+  /* the two inks that sit ON the creature's colours rather than beside them */
+  --on-peach: #46281f;
+  --on-ember: #52260c;
+  /* --ember is a fill. This is the weight money is set in, dark enough to
+     clear 4.5:1 on the paper AND on the paper-2 row-hover tint underneath
+     it (5.15 and 4.70); at #b34e17 the hover state fell to 4.46. */
+  --ember-ink: #ae4b15;
 
-  /* heat, straight off the logo's spikes. Three values because orange
-     needs a different weight on white than it does on violet, and the
-     graphics need the pure one. */
-  --ember: #ff9b3d;
-  --ember-ink: #b84e06;
-  --ember-sky: #ffb05c;
+  --serif: 'Alegreya', Georgia, 'Times New Roman', serif;
+  --sans: 'Alegreya Sans', ui-sans-serif, system-ui, sans-serif;
 
-  --display: 'Fredoka', ui-sans-serif, system-ui, sans-serif;
-  --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
-  --mono: 'DM Mono', ui-monospace, monospace;
+  /* ── the small-type ramp ──
+     Everything under the headings sits on these five steps and nowhere
+     between them. Written down because the build had drifted to fourteen
+     ad-hoc sizes between 0.7 and 1.08rem, which is not a ramp, it is a
+     pile — and on a page this quiet the difference shows. */
+  --fs-xs: 0.76rem;   /* pills, labels, ports, the smallest meta */
+  --fs-sm: 0.86rem;   /* captions, plan lines, dates, blurbs */
+  --fs-md: 0.94rem;   /* secondary UI text, notes, chips, footer */
+  --fs-lg: 1rem;      /* secondary body, list bodies, control labels */
+  --fs-xl: 1.06rem;   /* prose */
+  --fs-2xl: 1.45rem;  /* a price standing alone in a tile */
 
-  --maxw: 1120px;
-  --pad: clamp(18px, 4.5vw, 40px);
-  /* the space between sections carries the calm; nothing else has to */
-  --gap: clamp(38px, 5.5vw, 72px);
+  --maxw: 1040px;
+  --narrow: 720px;
+  --pad: clamp(20px, 5vw, 44px);
+  /* the quiet comes from this and almost nothing else */
+  --gap: clamp(56px, 8vw, 108px);
 
-  --r: 20px;
-  --r-sm: 10px;
+  /* there is one radius, on image plates. Sections carry no boxes. */
+  --r-sm: 8px;
 }
 
 * { box-sizing: border-box; }
@@ -60,6 +97,7 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 24px;
 }
 
 body {
@@ -67,156 +105,257 @@ body {
   color: var(--ink);
   background: var(--paper);
   font-family: var(--serif);
-  font-size: 18px;
-  line-height: 1.6;
+  font-size: 19px;
+  line-height: 1.62;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 a { color: inherit; }
 button { font-family: inherit; cursor: pointer; }
 img, svg { display: block; max-width: 100%; }
 
-::selection { background: var(--ember); color: #3a1a00; }
+/* ── browser surfaces ──
+   The parts nobody draws still belong to the system. */
+::selection { background: var(--peach); color: var(--on-peach); }
 
-h1, h2, h3, h4 {
-  margin: 0;
-  font-family: var(--display);
-  font-weight: 600;
-  line-height: 1.06;
-  letter-spacing: -0.02em;
+:root {
+  accent-color: var(--sky-deep);
+  caret-color: var(--ember-ink);
+  scrollbar-color: var(--rule-2) var(--paper);
 }
+
+:focus-visible {
+  outline: 2.5px solid var(--ember-ink);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* tabular figures wherever money or hours are compared down a column */
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* ── type ──
+   Two faces from one superfamily. The serif reads and the sans
+   labels; nothing else is needed and a third face would be noise. */
+h1, h2, h3 {
+  font-family: var(--serif);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.012em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1 { font-size: clamp(2.3rem, 5.6vw, 3.7rem); }
+h2 { font-size: clamp(1.75rem, 3.4vw, 2.5rem); }
+h3 { font-size: clamp(1.1rem, 1.7vw, 1.3rem); }
 
 p { margin: 0; }
 
-:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
-}
-/* on violet, an ink outline disappears */
-.on-sky :focus-visible { outline-color: var(--on-sky); }
-
-.wrap {
-  width: 100%;
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding-inline: var(--pad);
+/* the running text of the page, kept to a readable measure */
+.prose {
+  font-size: var(--fs-xl);
+  line-height: 1.65;
+  color: var(--ink-2);
+  max-width: 66ch;
 }
 
-/* ── DATA VOICE ────────────────────────────────────────────────────
-   Ports, prices, dates, statuses. The one un-round thing on the page,
-   and what stops a sky full of clouds from reading as a toy. */
-.mono {
-  font-family: var(--mono);
-  font-size: 0.72rem;
+/* small upright labels: the sans, spaced, never a monospace costume */
+.label {
+  font-family: var(--sans);
+  font-size: var(--fs-xs);
+  font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--ink-3);
+  margin: 0;
+}
+.on-sky .label { color: var(--on-sky-3); }
+
+/* ── layout ── */
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+.wrap-narrow { max-width: var(--narrow); }
+
+/* ── the sky ──
+   Two bands, one at each end, with a drawn horizon between the sky
+   and the paper. The line wobbles because a person drew it; it is
+   the only edge on the page that spends anything. */
+.sky {
+  position: relative;
+  background: var(--sky);
+  color: var(--on-sky);
+}
+.sky > * { position: relative; z-index: 1; }
+
+.horizon {
+  display: block;
+  width: 100%;
+  height: clamp(28px, 4vw, 46px);
+  color: var(--paper);
 }
 
-/* A tag, not a badge: no fill, no border, no radius. It names the thing
-   beside it and then gets out of the way. */
-.pill {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-.pill-ember { color: var(--ember-ink); }
-
-/* ── PANELS ───────────────────────────────────────────────────────
-   One surface: white, round, flat on the ground. The roundness is the
-   brand; the shadow it used to float on was not. */
-.panel {
-  border-radius: var(--r);
-  background: var(--panel);
-}
-
-/* ── BUTTONS ────────────────────────────────────────────────────── */
+/* ── actions ──
+   The blue carries the primary action, because on paper it is the
+   one colour with enough weight to be pressed and enough contrast
+   to be read. The orange is for money, not for buttons. */
 .btn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 12px 22px;
-  border: 2px solid var(--ember);
-  border-radius: var(--r-sm);
-  background: var(--ember);
-  color: #3a1a00;
-  font-family: var(--display);
-  font-size: 1rem;
-  font-weight: 600;
+  gap: 0.5em;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: var(--fs-lg);
+  letter-spacing: 0.005em;
   text-decoration: none;
-  transition: background 0.15s linear, border-color 0.15s linear;
+  padding: 0.72em 1.35em;
+  border: none;
+  border-radius: 999px;
+  background: var(--sky-deep);
+  /* paper, never --on-sky: when the sky went pale, --on-sky became ink and
+     this label silently went ink-on-deep-blue at 2.28:1 */
+  color: var(--paper);
+  transition: background 160ms ease, transform 160ms ease;
 }
-.btn:hover { background: #f2871f; border-color: #f2871f; }
+.btn:hover { background: var(--sky-deeper); }
+.btn:active { transform: translateY(1px); }
 
-.btn-soft,
-.btn-ghost {
-  border-color: var(--rule-2);
-  background: none;
+/* the sky is a tint, not an inversion, so the actions read the same on
+   both grounds and there is one button in the system rather than two */
+.btn-quiet {
+  background: transparent;
   color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--rule-2);
 }
-.btn-soft:hover,
-.btn-ghost:hover { background: none; border-color: var(--ink); }
+.btn-quiet:hover { background: var(--paper-2); }
+.on-sky .btn-quiet { box-shadow: inset 0 0 0 1.5px var(--rule-sky); }
+.on-sky .btn-quiet:hover { background: var(--wash); }
 
-.btn-sm { padding: 8px 15px; font-size: 0.9rem; }
-
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
-
-/* an inline link that reads as a next step */
+/* a text link that still reads as an action */
 .btn-text {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 7px;
-  font-family: var(--display);
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: var(--fs-lg);
+  color: inherit;
   text-decoration: underline;
   text-decoration-thickness: 1.5px;
   text-underline-offset: 4px;
-  transition: color 0.15s linear;
+  text-decoration-color: var(--rule-2);
+  transition: text-decoration-color 160ms ease;
 }
-.btn-text:hover { color: var(--ember-ink); }
+.btn-text:hover { text-decoration-color: currentColor; }
+.on-sky .btn-text { text-decoration-color: var(--rule-sky); }
 
-.on-sky .btn-text { color: var(--on-sky); }
-.on-sky .btn-text:hover { color: var(--ember-sky); }
-.on-sky .btn-soft { border-color: rgba(255, 255, 255, 0.45); color: var(--on-sky); }
-.on-sky .btn-soft:hover { border-color: var(--on-sky); }
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(14px, 2.4vw, 26px);
+}
 
-/* ── CHIPS ───────────────────────────────────────────────────────── */
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+/* ── prose links inside body copy ── */
+.prose a,
+.link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--rule-2);
+}
+.prose a:hover,
+.link:hover { text-decoration-color: currentColor; }
+
+/* ── money ── the one place the orange is allowed to be text */
+.money {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ember-ink);
+}
+
+/* ── tags and filters ──
+   Shared by the shop, the ideas grid and the reviewer checklist. A tag is
+   set in the sans and ruled, never filled: a filled bubble behind every
+   label turns a quiet page into confetti. */
+.pill {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  padding: 3px 9px 4px;
+  border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* the one filled tag: reserved for the handful of things Stern flags */
+.pill-ember {
+  background: var(--ember);
+  border-color: var(--ember);
+  color: var(--on-ember);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
 
 .chip {
-  padding: 6px 13px;
-  border: 1.5px solid var(--rule-2);
-  border-radius: var(--r-sm);
-  background: none;
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.05em;
+  font-family: var(--sans);
+  font-size: var(--fs-md);
+  font-weight: 500;
   color: var(--ink-2);
-  transition: border-color 0.15s linear, color 0.15s linear;
+  background: none;
+  padding: 6px 14px;
+  border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
 }
-.chip:hover { border-color: var(--ink); color: var(--ink); }
+.chip:hover { border-color: var(--ink-3); color: var(--ink); }
 .chip.on {
-  border-color: var(--ink);
-  background: var(--ink);
-  color: var(--panel);
-}
-.chip-n { margin-left: 8px; opacity: 0.6; }
-
-/* ── SHOW MORE ─────────────────────────────────────────────────────
-   Phones get a short grid and open the rest on request. Kept in CSS
-   so nothing watches the viewport and a resize reveals the rest. */
-.more-row { display: none; }
-
-@media (max-width: 640px) {
-  .more-row { display: grid; justify-items: center; margin-top: 18px; }
-  .grid.clipped > .card:nth-child(n + 7) { display: none; }
+  background: var(--sky-deep);
+  border-color: var(--sky-deep);
+  color: var(--paper);
 }
 
+.chip-n {
+  margin-left: 7px;
+  font-size: 0.82em;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.62;
+}
+
+/* ── button variants ── */
+.btn-sm { font-size: var(--fs-md); padding: 0.58em 1.15em; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--rule-2);
+}
+.btn-ghost:hover { background: var(--paper-2); }
+
+.btn-soft {
+  background: transparent;
+  color: var(--on-sky);
+  box-shadow: inset 0 0 0 1.5px var(--rule-sky);
+}
+.btn-soft:hover { background: var(--wash); }
+
+.more-row { display: flex; justify-content: center; margin-top: clamp(22px, 3vw, 34px); }
+
+.msg { color: var(--ink-2); font-size: var(--fs-lg); }
+
+/* ── motion ──
+   One idle drift on the creature, and nothing else moves on its own. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *,
@@ -226,8 +365,4 @@ p { margin: 0; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-}
-
-@media (max-width: 520px) {
-  body { font-size: 17px; }
 }

@@ -68,8 +68,10 @@
           data-analytics-kind={item.link ? item.kind : undefined}
           data-analytics-item={item.link ? item.title : undefined}
         >
-          <div class="thumb">
-            {#if item.image && !brokenImages.has(item.id)}
+          <!-- No photo, no plate. An empty rounded rectangle is not a
+               thumbnail, it is a hole, and most of these have no image. -->
+          {#if item.image && !brokenImages.has(item.id)}
+            <div class="thumb">
               <img
                 src={item.image}
                 alt={item.title}
@@ -78,16 +80,16 @@
                 referrerpolicy="no-referrer"
                 onerror={() => markBroken(item.id)}
               />
-            {:else}
-              <span class="blank" aria-hidden="true"></span>
-            {/if}
-            {#if item.kind === 'project'}<span class="pill pill-ember flag">shipped</span>{/if}
-          </div>
+              {#if item.kind === 'project'}<span class="pill pill-ember flag">shipped</span>{/if}
+            </div>
+          {:else if item.kind === 'project'}
+            <p class="tag-row"><span class="pill pill-ember">shipped</span></p>
+          {/if}
 
           <div class="card-body">
             <h3>{item.title}</h3>
             {#if spec}<p class="blurb">{spec}</p>{/if}
-            <p class="foot mono">{foot(item)}</p>
+            <p class="foot">{foot(item)}</p>
           </div>
         </svelte:element>
       </li>
@@ -127,7 +129,11 @@
     padding: 0;
   }
 
-  .tile { display: grid; grid-template-rows: auto 1fr; height: 100%; text-decoration: none; }
+  /* keep in step with CLIP above */
+  .grid.clipped > :nth-child(n + 7) { display: none; }
+
+  .tile { display: grid; grid-template-rows: auto 1fr; height: 100%; text-decoration: none; align-content: start; }
+  .tag-row { margin-bottom: 10px; }
 
   .thumb {
     position: relative;
@@ -135,7 +141,9 @@
     place-items: center;
     aspect-ratio: 5 / 4;
     border-radius: var(--r-sm);
-    background: var(--paper);
+    /* the plate has to differ from the ground it sits on, or an item with
+       no photo yet reads as a hole in the grid rather than an empty plate */
+    background: var(--paper-2);
     overflow: hidden;
   }
   .thumb img {
@@ -145,21 +153,12 @@
     height: 100%;
     object-fit: cover;
   }
-  .blank {
-    width: 42px;
-    height: 42px;
-    border: 2px solid var(--ink-3);
-    border-radius: 50%;
-    opacity: 0.4;
-  }
+  /* position only: the fill, the radius and the ink all come from
+     .pill-ember, which this element already carries */
   .flag {
     position: absolute;
     top: 8px;
     left: 8px;
-    padding: 3px 8px 4px;
-    border-radius: 6px;
-    background: var(--ember);
-    color: #3a1a00;
   }
 
   .card-body { padding-top: 12px; }
@@ -170,8 +169,7 @@
     -webkit-line-clamp: 2;
     line-clamp: 2;
     overflow: hidden;
-    min-height: 2.7em;
-    font-size: 1rem;
+    font-size: var(--fs-lg);
     font-weight: 600;
     line-height: 1.3;
   }
@@ -186,12 +184,18 @@
     line-clamp: 2;
     overflow: hidden;
     margin-top: 6px;
-    font-size: 0.88rem;
+    font-size: var(--fs-md);
     line-height: 1.45;
     color: var(--ink-2);
   }
 
-  .foot { margin-top: 9px; min-height: 1.1em; font-size: 0.6rem; }
+  .foot {
+    margin-top: 9px;
+    min-height: 1.1em;
+    font-family: var(--sans);
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
 
   .msg { color: var(--ink-2); }
   .link {
@@ -206,6 +210,6 @@
 
   @media (max-width: 640px) {
     .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-    h3 { font-size: 0.92rem; }
+    h3 { font-size: var(--fs-md); }
   }
 </style>

@@ -1,35 +1,27 @@
 <script>
-  // Every section is a white panel on the ground: a title in the left column,
-  // the one line of context in the right, then the body. Same shape every
-  // time, so the reader stops noticing it after the second section.
-  //
-  // The header used to carry a port number as a badge. Ports are real
-  // information, so they moved to the bill where they say something true about
-  // a machine, rather than sitting on "Questions" as decoration.
+  // A section on the paper. No panel, no card, no border — sections are
+  // told apart by the space between them and nothing else. That space is
+  // where all of the calm on this page comes from, so it is generous and
+  // it never varies.
   //
   //   <Unit id="shop" title="The shop" sub="…" cta="Full shop" href="…">…</Unit>
-  let {
-    title = '',
-    sub = '',
-    cta = '',
-    href = '',
-    id = '',
-    children
-  } = $props()
+  let { title = '', sub = '', cta = '', href = '', id = '', children } = $props()
 </script>
 
-<section class="unit panel" {id}>
+<section class="unit" {id} data-analytics-section={id}>
   <div class="head">
     <h2>{title}</h2>
-
-    <div class="aside">
-      {#if sub}<p class="sub">{sub}</p>{/if}
-      {#if cta && href}
-        <a class="btn-text" {href} data-analytics="CTA: Click" data-analytics-placement="unit-{id}">
-          {cta}
-        </a>
-      {/if}
-    </div>
+    {#if sub}<p class="sub">{sub}</p>{/if}
+    {#if cta && href}
+      <a
+        class="btn-text head-cta"
+        {href}
+        data-analytics="CTA: Click"
+        data-analytics-placement="unit-{id}"
+      >
+        {cta}
+      </a>
+    {/if}
   </div>
 
   <div class="body">
@@ -38,32 +30,24 @@
 </section>
 
 <style>
-  .unit { padding: clamp(26px, 3.6vw, 44px) clamp(22px, 3vw, 40px); }
+  .unit { padding-block: 0; }
 
   .head {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
-    gap: clamp(14px, 3vw, 48px);
+    justify-items: start;
+    /* more space above a heading than below it: the sub belongs to the
+       heading, so it sits close */
+    gap: 12px;
+    max-width: 66ch;
   }
-
-  h2 {
-    font-size: clamp(1.6rem, 3.2vw, 2.3rem);
-    max-width: 13ch;
-  }
-
-  .aside { display: grid; justify-items: start; gap: 14px; }
 
   .sub {
-    font-size: 1.02rem;
-    line-height: 1.5;
+    font-size: var(--fs-xl);
+    line-height: 1.6;
     color: var(--ink-2);
-    max-width: 54ch;
   }
 
-  .body { margin-top: clamp(26px, 3.5vw, 42px); }
+  .head-cta { margin-top: 4px; }
 
-  @media (max-width: 800px) {
-    .head { grid-template-columns: minmax(0, 1fr); }
-    h2 { max-width: none; }
-  }
+  .body { margin-top: clamp(28px, 4vw, 44px); }
 </style>

@@ -70,7 +70,7 @@
 </script>
 
 {#if loading}
-  <p class="msg mono">reading the shop…</p>
+  <p class="msg">Reading the shop…</p>
 {:else if prizes.length}
   {#if bands.length > 1}
     <div class="chips filters" role="group" aria-label="Filter by cost">
@@ -96,8 +96,10 @@
           data-analytics-item={p.name}
           data-analytics-stock={stockLabel(p) || 'unlimited'}
         >
-          <div class="thumb">
-            {#if p.imageUrl && !brokenImages.has(p.id)}
+          <!-- No photo, no plate: an empty rounded rectangle reads as a
+               hole in the shelf rather than as an item awaiting a photo. -->
+          {#if p.imageUrl && !brokenImages.has(p.id)}
+            <div class="thumb">
               <img
                 src={p.imageUrl}
                 alt={p.name}
@@ -106,18 +108,18 @@
                 referrerpolicy="no-referrer"
                 onerror={() => markBroken(p.id)}
               />
-            {:else}
-              <span class="blank" aria-hidden="true"></span>
-            {/if}
-            {#if p.isFeatured}<span class="pill pill-ember flag">pick</span>{/if}
-          </div>
+              {#if p.isFeatured}<span class="pill pill-ember flag">pick</span>{/if}
+            </div>
+          {:else if p.isFeatured}
+            <p class="tag-row"><span class="pill pill-ember">pick</span></p>
+          {/if}
 
           <div class="card-body">
             <h3>{p.name}</h3>
 
             <!-- what it holds, which is the whole reason to want it -->
             {#if cap}
-              <p class="cap mono">
+              <p class="cap">
                 <span class="cap-n">{cap.total}</span>
                 {#if cap.breakdown}<span class="cap-b">{cap.breakdown}</span>{/if}
               </p>
@@ -128,10 +130,10 @@
             {/if}
 
             <p class="cost">
-              <span class="cost-n">{cost.n}</span>{#if cost.u}<span class="cost-u mono">{cost.u}</span>{/if}
+              <span class="cost-n">{cost.n}</span>{#if cost.u}<span class="cost-u">{cost.u}</span>{/if}
             </p>
 
-            {#if anyMeta}<p class="meta mono">{meta(p)}</p>{/if}
+            {#if anyMeta}<p class="meta">{meta(p)}</p>{/if}
           </div>
         </a>
       </li>
@@ -178,9 +180,16 @@
     padding: 0;
   }
 
+  /* The shelf is thirty-odd items long. Six is a look at what is on it;
+     the rest is behind "show more", because an unclipped grid of near
+     identical cards is the loudest thing on a quiet page. Keep this in
+     step with CLIP above. */
+  .grid.clipped > :nth-child(n + 7) { display: none; }
+
   /* no card: the item sits on the panel it is already on. What separates one
      from the next is the space between them. */
-  .tile { display: grid; grid-template-rows: auto 1fr; height: 100%; text-decoration: none; }
+  .tile { display: grid; grid-template-rows: auto 1fr; height: 100%; text-decoration: none; align-content: start; }
+  .tag-row { margin-bottom: 10px; }
 
   /* a flat plate, so a product photo shot on white has something to sit on */
   .thumb {
@@ -189,7 +198,9 @@
     place-items: center;
     aspect-ratio: 5 / 4;
     border-radius: var(--r-sm);
-    background: var(--paper);
+    /* the plate has to differ from the ground it sits on, or an item with
+       no photo yet reads as a hole in the grid rather than an empty plate */
+    background: var(--paper-2);
   }
   /* absolute, not max-height: inside a grid row whose height comes from the
      aspect-ratio box, a percentage max-height resolves against nothing and
@@ -202,24 +213,12 @@
     object-fit: contain;
     mix-blend-mode: multiply;
   }
-  /* an item with no photo yet. Faint enough to stay quiet, solid enough that
-     the plate does not just look broken. */
-  .blank {
-    width: 42px;
-    height: 42px;
-    border: 2px solid var(--ink-3);
-    border-radius: 50%;
-    opacity: 0.4;
-  }
-
+  /* position only: the fill, the radius and the ink all come from
+     .pill-ember, which this element already carries */
   .flag {
     position: absolute;
     top: 8px;
     left: 8px;
-    padding: 3px 8px 4px;
-    border-radius: 6px;
-    background: var(--ember);
-    color: #3a1a00;
   }
 
   .card-body {
@@ -237,19 +236,22 @@
     -webkit-line-clamp: 2;
     line-clamp: 2;
     overflow: hidden;
-    font-size: 1rem;
+    font-size: var(--fs-lg);
     font-weight: 600;
     line-height: 1.3;
   }
   .tile:hover h3 { text-decoration: underline; text-underline-offset: 3px; }
 
+  /* these lines were sized for uppercase monospace. They are the sans now,
+     so they need a real reading size rather than a caption's. */
   .cap {
     display: flex;
     align-items: baseline;
     gap: 7px;
     min-height: 1.4em;
     margin-top: 4px;
-    font-size: 0.66rem;
+    font-family: var(--sans);
+    font-size: var(--fs-sm);
   }
   .cap-n { color: var(--ink-2); }
   .cap-b { color: var(--ink-3); font-size: 0.92em; }
@@ -260,7 +262,7 @@
     line-clamp: 1;
     overflow: hidden;
     font-family: var(--serif);
-    font-size: 0.86rem;
+    font-size: var(--fs-sm);
     text-transform: none;
     letter-spacing: 0;
     color: var(--ink-3);
@@ -274,16 +276,22 @@
     margin-top: 12px;
   }
   .cost-n {
-    font-family: var(--display);
+    font-family: var(--sans);
     font-weight: 600;
-    font-size: 1.5rem;
+    font-size: var(--fs-2xl);
     line-height: 1;
     letter-spacing: -0.02em;
     color: var(--ember-ink);
   }
-  .cost-u { font-size: 0.6rem; color: var(--ink-3); }
+  .cost-u { font-family: var(--sans); font-size: var(--fs-sm); color: var(--ink-3); }
 
-  .meta { margin-top: 8px; min-height: 1.1em; font-size: 0.58rem; }
+  .meta {
+    margin-top: 8px;
+    min-height: 1.1em;
+    font-family: var(--sans);
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+  }
 
   .card.sold-out .thumb { opacity: 0.45; }
   .card.sold-out .cost-n { color: var(--ink-3); }
@@ -302,7 +310,7 @@
 
   @media (max-width: 640px) {
     .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-    h3 { font-size: 0.92rem; }
+    h3 { font-size: var(--fs-md); }
     .cost-n { font-size: 1.2rem; }
   }
 </style>

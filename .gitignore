@@ -4,3 +4,7 @@ dist
 .DS_Store
 *.local
 .vercel
+
+# impeccable design-skill scratch state (hook cache, review screenshots,
+# decision-page sessions) — not project source, safe to regenerate
+.impeccable/
