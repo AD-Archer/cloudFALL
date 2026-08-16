@@ -32,15 +32,12 @@ export const CONFIG = {
  * instead. `usd` is a rough US list price, which the section says out loud;
  * the point of the number is the size of it, not the cent.
  *
- * The `common` three are ticked on arrival so the page states a real number
- * before anyone touches it; the section says out loud that it is a guess.
- *
+ * Nothing here is ticked by default — the total is only meaningful once it
+ * is the visitor's own list, not a guess seeded for them.
  */
 /**
  * The tabs the ledger groups these into. Eleven rows in one run is a wall;
  * four short lists you can flip between is a thing you can actually read.
- * `common` marks the handful that are ticked on arrival so the page shows
- * a real number before you touch it — labelled as a guess, not as yours.
  */
 export const RENTAL_GROUPS = [
   { id: "watch", label: "Watching" },
@@ -53,7 +50,6 @@ export const RENTALS = [
   {
     id: "video",
     group: "watch",
-    common: true,
     brand: "netflix",
     swapBrand: "jellyfin",
     service: "Netflix",
@@ -65,7 +61,6 @@ export const RENTALS = [
   {
     id: "music",
     group: "listen",
-    common: true,
     brand: "spotify",
     swapBrand: null,
     service: "Spotify",
@@ -77,7 +72,6 @@ export const RENTALS = [
   {
     id: "photos",
     group: "store",
-    common: true,
     brand: "googlephotos",
     swapBrand: "immich",
     service: "Google Photos",

@@ -304,7 +304,7 @@
     <Unit
       id="shop"
       title="The shop"
-      sub="Priced in the hours you logged, cheapest first. Somewhere to put the library once it is yours."
+      sub="For every hour you work you can get rewarded and redeem your hours for prizes."
       cta="See the full shop"
       href={CONFIG.programUrl}
     >
@@ -522,26 +522,46 @@
   /* One column and no mascot: the banner above already carries him, as the
      o of cloud. Two instances of one drawing at one scale in one viewport
      reads as a template repeat and spends the wordmark's joke twice. His
-     first standalone appearance is the docs section, where it lands. */
+     first standalone appearance is the docs section, where it lands.
+
+     Centred, not left-aligned: the full-bleed banner reads as a centred
+     graphic, so text that jumps hard-left underneath it read as two
+     different alignments arguing with each other. The status line below
+     stays left — it is a status readout, not part of the hero's pitch,
+     and centring a long list of short facts turns it into a ragged
+     stack rather than a scanned line. */
   .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
     padding-top: clamp(14px, 1.8vw, 22px);
     padding-bottom: clamp(20px, 2.6vw, 30px);
   }
+
+  .hero-copy { max-width: 640px; }
 
   h1 { letter-spacing: -0.02em; }
 
   .hero-line {
     margin-top: 16px;
+    margin-inline: auto;
     font-size: clamp(1.06rem, 1.5vw, 1.19rem);
     line-height: 1.58;
     color: var(--on-sky-2);
     max-width: 52ch;
   }
 
-  .hero .actions { margin-top: 24px; }
+  .hero .actions {
+    margin-top: 24px;
+    justify-content: center;
+  }
 
 
-  /* ── the quiet line under the hero ── */
+  /* ── the quiet line under the hero ──
+     Left-aligned on purpose, against the centred hero above it: this is
+     a scanned status line, not a pitch, and centring a row of short
+     unequal facts turns a scan into a ragged stack. */
   .readout {
     display: flex;
     flex-wrap: wrap;

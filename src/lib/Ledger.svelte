@@ -7,10 +7,8 @@
   // tab labels carry their own running counts so nothing you ticked ever
   // disappears without trace.
   //
-  // Three common ones arrive already ticked. A page that opens on $0 makes
-  // the visitor do arithmetic before it will tell them anything, and the
-  // number is the point of the section — so it states a real one straight
-  // away and says out loud that it is a guess at an ordinary household.
+  // Nothing is ticked to begin with: the total is only worth anything once
+  // it is the visitor's own list, not a guess seeded for them.
   //
   // Ticking a row also shows what would stand in its place, so the saving
   // is a real thing you could build, not just a number that vanished.
@@ -20,8 +18,7 @@
 
   let { docsUrl = '' } = $props()
 
-  let picked = $state(new Set(RENTALS.filter((r) => r.common).map((r) => r.id)))
-  let touched = $state(false)
+  let picked = $state(new Set())
   let tab = $state(RENTAL_GROUPS[0].id)
 
   let chosen = $derived(RENTALS.filter((r) => picked.has(r.id)))
@@ -59,7 +56,6 @@
       trackEvent('Ledger: Tick', { service: r.service, monthly: (monthly + r.usd).toFixed(2) })
     }
     picked = next
-    touched = true
   }
 
   function chooseTab(id) {
@@ -70,7 +66,6 @@
 
   function clear() {
     picked = new Set()
-    touched = true
     trackEvent('Ledger: Clear', {})
   }
 </script>
