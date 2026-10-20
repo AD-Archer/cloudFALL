@@ -180,7 +180,7 @@ Calm is enforced structurally, not stylistically. There are no cards, no panels,
 A palette sampled off two drawings: a dusty blue lifted from the lettering, warm paper under it, and a peach-orange family taken from the creature and given exclusively to money.
 
 ### Primary
-- **Dusty Sky Blue** (`sky-deep`): every primary action on the page — the sign-up buttons, the selected filter chip, the checked state of the drawn checkbox, and the browser's own `accent-color`. It is the one colour on paper with enough weight to be pressed and enough contrast to be read.
+- **Dusty Sky Blue** (`sky-deep`): every primary action on the page — the sign-up buttons, the selected filter chip, a rail's previous/next buttons, the checked state of the drawn checkbox, and the browser's own `accent-color`. It is the one colour on paper with enough weight to be pressed and enough contrast to be read.
 - **Pale Sky** (`sky`): the two bands at the head and foot of the page and the full ground of the status pages, and nowhere else. It is a tint of the ink family, not an inversion: text on it is still ink, and the same button works on both grounds.
 
 ### Secondary
@@ -239,15 +239,15 @@ One column, centred, `max-width: 1040px` (`--maxw`) with a narrow variant at 720
 
 The vertical rhythm is one token. Sections on the paper are a CSS grid with `gap: clamp(56px, 8vw, 108px)` (`--gap`) and no padding, borders or backgrounds of their own; the sky's foot band takes the same value as its top margin. Inside a section, the heading block and its body are separated by `clamp(28px, 4vw, 44px)`, and the heading sits 12px above its sub. Almost all of the calm on this page comes from that one gap value and nothing else.
 
-Recurring internal grids: a **150px label column plus fluid content** for the how-it-works steps, the reviewer checks and the news/events feed; a **1.5fr / 1fr split** for the ledger's list and its sticky total; a **fluid copy column plus an auto mascot column** for the docs block and the closer. Item grids are `repeat(auto-fill, minmax(204px, 1fr))` with a `clamp(16px, 2.2vw, 26px)` gutter.
+Recurring internal grids: a **150px label column plus fluid content** for the how-it-works steps, the reviewer checks and the news/events feed; a **1.5fr / 1fr split** for the ledger's list and its sticky total; a **fluid copy column plus an auto mascot column** for the docs block and the closer. Item rows are **rails** (`.rail` in app.css): one row that scrolls sideways inside its section, items at a fixed `clamp(140px, 38vw, 232px)` so the next one always peeks past the edge, `clamp(16px, 2.2vw, 26px)` gutter, `scroll-snap-type: x proximity`. The shop and the community projects both run on it. The page itself never scrolls sideways.
 
-Breakpoints are three and behavioural: **860px** collapses the label columns to one column and the ledger to a single stack (its sticky total goes static and its list min-height floor is released); **720px** stacks the status page; **640px** fixes item grids to two columns and drops card titles to 0.92rem; **520px** moves a ledger row's price beneath its name. The mascot never takes more than 34vw regardless of the size he is asked for, and beside the docs and closer copy he stays alongside rather than dropping below.
+Breakpoints are three and behavioural: **860px** collapses the label columns to one column and the ledger to a single stack (its sticky total goes static and its list min-height floor is released); **720px** stacks the status page; **640px** drops card titles to 0.92rem; **520px** moves a ledger row's price beneath its name. The mascot never takes more than 34vw regardless of the size he is asked for, and beside the docs and closer copy he stays alongside rather than dropping below.
 
 ### Named Rules
 
 **The One Gap Rule.** Section separation is `--gap`, always, and it never varies by section importance. If a section needs more weight it gets a heavier rule, not more air.
 
-**The Clip Constant Rule.** Any grid that hides its tail behind a "show more" keeps a `nth-child(n + N+1)` display rule in step with the JS `CLIP` constant in the same file (currently 6 in both the shop and the ideas grid). These two have already drifted apart once; change them together or the button lies about how many are left.
+**The Peek Rule.** A rail (always drawn through `Rail.svelte`) has no edge fade and no "show more": the next item cut off at the edge says it scrolls, so item width stays fixed rather than fitting the row exactly. Previous/next buttons sit on the rail's two sides, centred on the photo plate (from the shared `--rail-item` token): half out into the page gutter from 800px up, just inside the edge below that. They are 40px circles filled `sky-deep` (hover `sky-deeper`) with a `paper` SVG chevron, the same pairing as a primary button, and they page by as many whole items as are in view. Each fades out at its own end, so both are gone when the row already fits. Filter chips sit above the rail, not beside the buttons. Changing filters on a rail sends it back to the front.
 
 ## Elevation & Depth
 
@@ -289,7 +289,7 @@ The recurring silhouette is the horizontal line: a page of full-width hairlines 
 ### Chips
 
 - **Style:** sans 500 at 0.9rem, transparent with a 1px `rule-2` outline, pill shape, `6px 14px`. An optional trailing count sets at 0.82em with 0.62 opacity.
-- **State:** hover raises the border to `ink-3` and the label to `ink`; selected fills `sky-deep` with a `paper` label. Chips carry filter state in the shop, the ideas grid and the ledger's tabs, and a chip whose bucket is empty is never rendered.
+- **State:** hover raises the border to `ink-3` and the label to `ink`; selected fills `sky-deep` with a `paper` label. Chips carry filter state in the shop and the ledger's tabs, and a chip whose bucket is empty is never rendered.
 
 ### Tags (pills)
 
@@ -333,7 +333,7 @@ Serif 600 at 1.08rem on a full-width hairline-separated row; hover takes the que
 - **Do** measure any new text tint against the ground it will actually sit on, and clear 4.5:1 before it lands.
 - **Do** put a filled action's label in `paper` on both grounds — one button serves the sky and the paper.
 - **Do** set every number in Alegreya Sans with tabular figures.
-- **Do** keep a "show more" grid's `nth-child` rule in step with its JS `CLIP` constant, in the same edit.
+- **Do** put a long row of items on a `.rail` rather than a clipped grid, and keep its items fixed-width so the next one peeks.
 - **Do** keep the native element and forward `:focus-visible` by hand whenever a control is drawn rather than default.
 - **Do** draw an indicator (plus/minus, tick, glyph) as an SVG or CSS stroke.
 

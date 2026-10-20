@@ -22,48 +22,26 @@ export const fetchRules = () => get("/rules");
 export const fetchFaq = () => get("/faq");
 export const fetchNews = (limit = 6) => get(`/news?limit=${limit}`);
 export const fetchEvents = () => get("/events?upcoming=true");
-export const fetchExamples = (kind = "all") => get(`/examples?kind=${kind}`);
+export const fetchStarred = () => get("/starred");
 
 /**
- * Ideas and shipped projects arrive as two lists with slightly different
- * shapes. Fold them into one so the page renders a single grid.
+ * Sealed community projects, flattened to what a rail item draws. Stern
+ * orders them most recently touched first; this keeps that order but moves
+ * the ones without a screenshot to the back, since a row of pictures with a
+ * bare title stranded between them reads as a broken image.
  */
-export function normalizeExamples(payload) {
-  const one = (raw, kind) => {
-    const effortRaw = raw.estimatedHours ?? raw.effortHint ?? raw.hours ?? null;
-    const hours = Number.parseFloat(effortRaw);
-    const effort = Number.isFinite(hours) ? hours : null;
-
-    return {
-      id: raw.id ?? raw.projectId ?? `${kind}:${raw.title ?? raw.name ?? ""}`,
-      kind,
-      title: String(raw.title ?? raw.name ?? "").trim(),
-      description: String(raw.description ?? raw.summary ?? "").trim(),
-      image: raw.imageUrl ?? raw.image ?? "",
-      link: raw.linkUrl ?? raw.url ?? raw.demoUrl ?? raw.repoUrl ?? "",
-      credit: String(raw.credit ?? raw.author ?? "").trim(),
-      effort,
-      effortLabel:
-        effort !== null ? `~${effort} hrs` : String(effortRaw ?? "").trim(),
-      tags: (raw.tags ?? []).filter(Boolean).map(String),
-    };
-  };
-
-  const list = [
-    ...(payload?.ideas ?? []).map((raw) => one(raw, "idea")),
-    ...(payload?.projects ?? []).map((raw) => one(raw, "project")),
-  ];
-
-  return sortExamples(list.filter((e) => e.title));
-}
-
-// Quickest builds first, so the list opens on something you could start
-// tonight. Anything without an effort hint sinks rather than floats.
-export function sortExamples(list = []) {
-  const rank = (e) => e.effort ?? Number.MAX_SAFE_INTEGER;
-  return [...list].sort(
-    (a, b) => rank(a) - rank(b) || a.title.localeCompare(b.title),
-  );
+export function normalizeStarred(payload) {
+  const list = (payload?.projects ?? [])
+    .map((raw) => ({
+      id: raw.id,
+      name: String(raw.name ?? "").trim(),
+      description: String(raw.description ?? "").trim(),
+      image: raw.screenshotUrls?.[0] ?? "",
+      url: raw.url ?? "",
+      builder: String(raw.builder?.handle ?? "").trim(),
+    }))
+    .filter((p) => p.id && p.name && p.url);
+  return [...list.filter((p) => p.image), ...list.filter((p) => !p.image)];
 }
 
 // Cheapest first: the hours gate decides what you can even reach, then price
@@ -81,7 +59,7 @@ export function sortPrizes(prizes = []) {
  * so a single failure degrades one section instead of the page.
  */
 export async function loadContent() {
-  const [program, prizes, rules, faq, news, events, examples] =
+  const [program, prizes, rules, faq, news, events, starred] =
     await Promise.allSettled([
       fetchProgram(),
       fetchPrizes(),
@@ -89,7 +67,7 @@ export async function loadContent() {
       fetchFaq(),
       fetchNews(),
       fetchEvents(),
-      fetchExamples(),
+      fetchStarred(),
     ]);
 
   const value = (r) => (r.status === "fulfilled" ? r.value : null);
@@ -106,9 +84,9 @@ export async function loadContent() {
     faq: value(faq)?.faq ?? [],
     news: value(news)?.news ?? [],
     events: value(events)?.events ?? [],
-    examples: normalizeExamples(value(examples)),
-    // `examples` is deliberately absent from failures: an empty or missing
-    // Explore feed is the normal state, not a fault worth reporting.
+    starred: normalizeStarred(value(starred)),
+    // `starred` is deliberately absent from failures: nothing sealed yet is
+    // the normal state, not a fault worth reporting.
     failures: [
       failed(program, "program"),
       failed(prizes, "prizes"),

@@ -85,6 +85,9 @@
   --maxw: 1040px;
   --narrow: 720px;
   --pad: clamp(20px, 5vw, 44px);
+  /* one item on a rail; Rail.svelte centres its buttons on the photo plate
+     from this, so the two must stay one token */
+  --rail-item: clamp(140px, 38vw, 232px);
   /* the quiet comes from this and almost nothing else */
   --gap: clamp(56px, 8vw, 108px);
 
@@ -278,7 +281,7 @@ p { margin: 0; }
 }
 
 /* ── tags and filters ──
-   Shared by the shop, the ideas grid and the reviewer checklist. A tag is
+   Shared by the shop and the reviewer checklist. A tag is
    set in the sans and ruled, never filled: a filled bubble behind every
    label turns a quiet page into confetti. */
 .pill {
@@ -351,6 +354,31 @@ p { margin: 0; }
 .btn-soft:hover { background: var(--wash); }
 
 .more-row { display: flex; justify-content: center; margin-top: clamp(22px, 3vw, 34px); }
+
+/* ── rails ──
+   A row of items that scrolls sideways inside its section; the page itself
+   never does. Item width is fixed so the next one always peeks in past the
+   edge. Drawn through Rail.svelte, which puts previous/next buttons on its
+   sides for anyone without a trackpad or a thumb; no edge fade. */
+.rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--rail-item);
+  gap: clamp(16px, 2.2vw, 26px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  list-style: none;
+  margin: 0;
+  /* room for the scrollbar, and for a focused item's outline */
+  padding: 4px 4px 16px;
+  margin-inline: -4px;
+  /* snap to the content edge, not the padding edge, or the rail scrolls
+     itself 4px on load and clips the first item */
+  scroll-padding-inline: 4px;
+}
+.rail > * { scroll-snap-align: start; }
 
 .msg { color: var(--ink-2); font-size: var(--fs-lg); }
 

@@ -7,11 +7,10 @@
   import { trackEvent } from './insight.js'
   import { novelBlurb } from './text.js'
   import { capacity } from './spec.js'
+  import Rail from './Rail.svelte'
 
   let { prizes = [], loading = false, shopUrl = '', programUrl = '' } = $props()
 
-  const CLIP = 6
-  let open = $state(false)
   let band = $state('all')
 
   let brokenImages = $state(new Set())
@@ -39,8 +38,7 @@
 
   const chooseBand = (next) => {
     if (next === band) return
-    band = next
-    open = false // a new filter is a new list; re-clip it on phones
+    band = next // Rail takes this as its resetKey and goes back to the front
     trackEvent('Shop: Filter', { band: next, results: shown.length })
   }
 
@@ -72,17 +70,18 @@
 {#if loading}
   <p class="msg">Reading the shop…</p>
 {:else if prizes.length}
-  {#if bands.length > 1}
-    <div class="chips filters" role="group" aria-label="Filter by cost">
-      {#each bands as b}
-        <button type="button" class="chip" class:on={band === b.id} onclick={() => chooseBand(b.id)}>
-          {b.label}{#if b.id !== 'all'}<span class="chip-n">{b.n}</span>{/if}
-        </button>
-      {/each}
-    </div>
-  {/if}
-
-  <ul class="grid" class:clipped={!open}>
+  <Rail label="Shop items" resetKey={band}>
+    {#snippet lead()}
+      {#if bands.length > 1}
+        <div class="chips" role="group" aria-label="Filter by cost">
+          {#each bands as b}
+            <button type="button" class="chip" class:on={band === b.id} onclick={() => chooseBand(b.id)}>
+              {b.label}{#if b.id !== 'all'}<span class="chip-n">{b.n}</span>{/if}
+            </button>
+          {/each}
+        </div>
+      {/if}
+    {/snippet}
     {#each shown as p, i}
       {@const spec = novelBlurb(p.name, p.description)}
       {@const cap = capacity(p.name, p.description)}
@@ -138,22 +137,7 @@
         </a>
       </li>
     {/each}
-  </ul>
-
-  {#if !open && shown.length > CLIP}
-    <div class="more-row">
-      <button
-        type="button"
-        class="btn btn-ghost btn-sm"
-        onclick={() => {
-          open = true
-          trackEvent('Shop: Show More', { band, total: shown.length })
-        }}
-      >
-        Show {shown.length - CLIP} more
-      </button>
-    </div>
-  {/if}
+  </Rail>
 
   {#if !shown.length}
     <p class="msg">
@@ -169,22 +153,10 @@
 {/if}
 
 <style>
-  .filters { padding-bottom: 24px; }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(204px, 1fr));
-    gap: clamp(16px, 2.2vw, 26px);
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  /* The shelf is thirty-odd items long. Six is a look at what is on it;
-     the rest is behind "show more", because an unclipped grid of near
-     identical cards is the loudest thing on a quiet page. Keep this in
-     step with CLIP above. */
-  .grid.clipped > :nth-child(n + 7) { display: none; }
+  /* The shelf is thirty-odd items long, so it runs sideways on a Rail
+     rather than stacking: one row is a look at what is on it, and
+     an unclipped grid of near identical cards would be the loudest thing on
+     a quiet page. */
 
   /* no card: the item sits on the panel it is already on. What separates one
      from the next is the space between them. */
@@ -309,7 +281,6 @@
   }
 
   @media (max-width: 640px) {
-    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
     h3 { font-size: var(--fs-md); }
     .cost-n { font-size: 1.2rem; }
   }

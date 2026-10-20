@@ -27,9 +27,9 @@ Stop wasting money on subscriptions — learn to replace them yourself. Unlike a
 
 ## Capabilities and Constraints
 
-- Single-page app. As of the 2026-08-16 rebuild the running order is: hero ("what this is"), the ledger ("what you pay for" plus the year's total), how it works, a docs section pointing at sterndocs.hackclub.com/cloudfall, project ideas, prize shop, submission rules, news, events, FAQ, a Hack Club block, signup/closer, footer. Cut in that rebuild, on the user's "calm and simple" brief: the separate "who we are" block, the "new here / terms" block, and the "never hosted anything" help list — the docs section now carries the last of these.
+- Single-page app. As of the 2026-08-16 rebuild the running order is: hero ("what this is"), the ledger ("what you pay for" plus the year's total), how it works, a docs section pointing at sterndocs.hackclub.com/cloudfall, community projects (sealed in Stern), prize shop, submission rules, news, events, FAQ, a Hack Club block, signup/closer, footer. Cut in that rebuild, on the user's "calm and simple" brief: the separate "who we are" block, the "new here / terms" block, and the "never hosted anything" help list — the docs section now carries the last of these.
 - Uses official Hack Club branding assets (flags, icons) that must be preserved as-is per Hack Club brand usage.
-- Content dynamically pulled from Stern at runtime; a redesign must keep working against that live data shape (program, shop items, rules, FAQ, news, events, examples/ideas) rather than hardcoding copy that Stern already owns.
+- Content dynamically pulled from Stern at runtime; a redesign must keep working against that live data shape (program, shop items, rules, FAQ, news, events, starred projects) rather than hardcoding copy that Stern already owns.
 - Refer to "Hack Club" only that way (never "Hackclub," "hack club," or "HackClub") — org-level requirement.
 
 ## Brand Commitments

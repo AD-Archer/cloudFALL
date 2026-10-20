@@ -5,7 +5,7 @@
   import Ledger from './lib/Ledger.svelte'
   import Shop from './lib/Shop.svelte'
   import Rules from './lib/Rules.svelte'
-  import Examples from './lib/Examples.svelte'
+  import Starred from './lib/Starred.svelte'
   import StatusPage from './lib/StatusPage.svelte'
   import { loadContent } from './lib/api/stern.js'
   import { initAnalytics, refreshAnalyticsSections, trackEvent } from './lib/insight.js'
@@ -26,7 +26,7 @@
     faq: [],
     news: [],
     events: [],
-    examples: []
+    starred: []
   })
 
   // ── THE RUN ──
@@ -289,14 +289,14 @@
       </div>
     </section>
 
-    <!-- ── THINGS PEOPLE BUILD (live, hidden when empty) ── -->
-    {#if api.examples.length}
+    <!-- ── BUILT BY THE COMMUNITY (live, hidden when empty) ── -->
+    {#if api.starred.length}
       <Unit
-        id="ideas"
-        title="Things to build"
-        sub="These are things that already exist, hosting them don't count. Try to find a way to take this and make it your own, rather its a client, a plugin, or something brand new."
+        id="built"
+        title="Built by the community"
+        sub="Projects people shipped through cloudFALL that we think are worth a look."
       >
-        <Examples items={api.examples} />
+        <Starred items={api.starred} />
       </Unit>
     {/if}
 
@@ -579,6 +579,10 @@
   /* ═══════════ THE GROUND ═══════════ */
   .stack {
     display: grid;
+    /* minmax(0, …), not the implicit auto: an auto track grows to its widest
+       child, and a rail's whole row is that wide, so the page would scroll
+       sideways instead of the rail */
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--gap);
     padding-top: clamp(46px, 7vw, 88px);
   }
